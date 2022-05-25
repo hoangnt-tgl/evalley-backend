@@ -9,9 +9,14 @@ app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
 var user = require('./routes/user');
 var province = require('./routes/province');
+var voucher = require('./routes/voucher');
+var product = require('./routes/product');
+
 
 app.use('/user', user);
 app.use('/province', province);
+app.use('/voucher', voucher);
+app.use('/product', product);
 
 var mongoose = require("mongoose");
 mongoose.set('useNewUrlParser', true);

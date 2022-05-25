@@ -100,4 +100,29 @@ router.post('/getinfo', function(req, res, next) {
         res.json(user);
     });
 });
+
+router.post('/update', function(req, res, next) {
+    return;
+});
+
+router.post('/changepassword', function(req, res, next) {
+});
+
+router.post('/forgotpassword', function(req, res, next) {
+});
+
+router.post('/resetpassword', function(req, res, next) {
+});
+router.post('/block', function(req, res, next) {
+});
+router.post('/unblock', function(req, res, next) {
+});
+router.post('/delete', function(req, res, next) {
+});
+router.get('/verify', function(req, res, next) {
+});
+
+
+
+
 module.exports = router;
