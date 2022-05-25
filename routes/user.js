@@ -1,5 +1,6 @@
 var express = require('express');
 var bcrypt = require('bcryptjs');
+var jwt = require("jsonwebtoken");
 var router = express.Router();
 var User = require('../routes/user');
 /* GET home page. */
@@ -46,27 +47,40 @@ router.post('/login', function(req, res, next) {
             return;
         }
         if(!user){
-            res.json({message: 'User not found'});
+            res.json({success: false, message: 'User not found'});
             return;
         }
         if(user.status != 'active'){
-            res.json({message: 'The account has not been verified'});
+            res.json({success: false, message: 'The account has not been verified'});
             return;
         }
         else if (user.status == 'block'){
-            res.json({message: 'The account has been blocked'});
+            res.json({success: false, emessage: 'The account has been blocked'});
             return;
         }
         else{
-            bcrypt.compare(req.body.password, user.password, function(err, isMatch){
+            bcrypt.compareSync(req.body.password, user.password, function(err, isMatch){
                 if(err){
                     res.send(err);
                     return;
                 }
                 if(isMatch){
-                    res.json({message: 'User has been logged in'});
+                    var token = jwt.sign({
+                        id: _id, 
+                        role: user.role,
+                        name: user.name,
+                        email: user.email,
+                    }, 'secret', {
+                        expiresIn: 604800 // 1 week
+                    });
+                    res.json({
+                        success: true,
+                        user: user,
+                        access_token: token,
+                        message: 'User has been logged in'
+                    });
                 } else {
-                    res.json({message: 'Password is incorrect'});
+                    res.json({success: false, message: 'Password is incorrect'});
                 }
             });
         }

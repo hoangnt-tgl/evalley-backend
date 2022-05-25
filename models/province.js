@@ -1,25 +1,34 @@
 var mongoose = require("mongoose")
 // User Schema
 var ProvinceSchema = mongoose.Schema({
-	Id:{
-		type: Number,
-	},
-	Name: {
-		type: String,
-	},
-	Districts: {
-		Id:Number,
-        DistrictCode: String,
-        DistrictName: String,
-        GHNSupport: Number,
-        TTCSupport: Number,
-        VNPTSupport: Number,
-        ViettelPostSupport: Number,
-        ShipChungSupport: Number,
-        GHNDistrictCode: String,
-        ViettelPostDistrictCode: String,
-        ShipChungDistrictCode: String
-	}
+	code: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+    },
+    district: [{
+        name: {
+            type: String,
+        },
+        pre: {
+            type: String,
+        },
+        ward: [{
+            name: {
+                type: String,
+            },
+            pre: {
+                type: String,
+            }
+        }],
+        street: [{
+            name: {
+                type: String,
+            }
+        }]
+    }]
 });
 
 var Province = module.exports = mongoose.model('province', ProvinceSchema);
