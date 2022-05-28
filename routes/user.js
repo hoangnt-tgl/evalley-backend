@@ -22,12 +22,19 @@ router.post('/register', function(req, res, next) {
         res.send(errors);
         return;
     } else {
-        User.register(newUser, function(err, user){
+        User.getUserByEmail(newUser.email, function(err, user){
+            if(err) throw err;
+            if(user){
+                res.json({success: false, msg: 'User already exists'});
+                return;
+            }
+        });
+        User.addUser(newUser, function(err, user){
             if(err){
                 res.send(err);
                 return;
             }
-            res.json({message: 'User has been registered'});
+            res.json({success: true, message: 'User has been registered'});
         });
     }
 
@@ -120,6 +127,7 @@ router.post('/unblock', function(req, res, next) {
 router.post('/delete', function(req, res, next) {
 });
 router.get('/verify', function(req, res, next) {
+    
 });
 
 
