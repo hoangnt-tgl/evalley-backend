@@ -1,7 +1,31 @@
 var mongoose = require("mongoose")
 var bcrypt = require('bcryptjs');
+const nodemailer = require('nodemailer')
+const BASE_URL = 'http://localhost:3000/';
+
+let transporter = nodemailer.createTransport({
+	service: 'gmail',
+	auth: {
+		user: 'shoppingwithevalley@gmail.com',
+		pass: 'nguyentronghoang'
+	}
+})
+transporter.verify((error, success) => {
+	if (error) {
+		console.log(error)
+	}
+	else {
+		console.log('Ready for message');
+		console.log(success);
+	}
+})
+
 // User Schema
 var UserSchema = mongoose.Schema({
+    username : {
+        type: String,
+        required: true
+    },
 	name: {
         type: String,
     },
@@ -51,6 +75,28 @@ var UserSchema = mongoose.Schema({
 	
 
 var User = module.exports = mongoose.model('user', UserSchema);
+const SendMail = (email, username, id) => {
+    bcrypt.hash(username, 10, function(err, hash){
+        var mailOptions = {
+            from: 'shoppingwithevalley@gmail.com',
+            to: email,
+            subject: 'Welcome to Shopping With Valley',
+            html: `<h1>Welcome to Shopping With Valley</h1>
+            <p>Your account has been created</p>
+            <p>Username: ${username}</p>
+            <p>Please click <a href="${BASE_URL}user/activate/${username}/${id}">here</a> to verify your account</p>`
+        }
+        transporter.sendMail(mailOptions, (error, info) => {
+            if (error) {
+                console.log(error)
+            }
+            else {
+                console.log('Email sent: ' + info.response);
+            }
+        })
+    })
+}
+
 
 module.exports.addUser = function(newUser, callback){
     bcrypt.genSalt(10, function(err, salt) {
@@ -59,6 +105,7 @@ module.exports.addUser = function(newUser, callback){
 	        newUser.save(callback);
 	    });
 	});
+    SendMail(newUser.email, newUser.username, newUser._id);
 }
 
 module.exports.getUserByEmail = function(email, callback){
@@ -70,4 +117,16 @@ module.exports.getUserById = function(id, callback){
     User.findById(id, callback);
 }
 
+module.exports.getUserByUsername = function(username, callback){
+    var query = {username: username};
+    User.findOne(query, callback);
+}
 
+module.exports.getAllUser = function(callback){
+    User.find(callback);
+}
+module.exports.updateUserStatus = function(id, status, callback){
+    var query = {_id: id};
+    var update = {status: status};
+    User.findOneAndUpdate(query, update, callback);
+}

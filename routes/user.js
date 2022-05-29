@@ -2,16 +2,17 @@ var express = require('express');
 var bcrypt = require('bcryptjs');
 var jwt = require("jsonwebtoken");
 var router = express.Router();
-var User = require('../routes/user');
+var User = require('../models/user');
 /* GET home page. */
 
 router.post('/register', function(req, res, next) {
     var newUser = new User({
-        name : req.body.name,
+        username: req.body.username,
         email: req.body.email,
-        password : req.body.password
+        password: req.body.password,
     });
-    req.checkBody('name', 'Name is required').notEmpty();
+    req.checkBody('username', 'Username is required').notEmpty();
+    req.checkBody('username', 'Username must be at least 6 characters long').isLength({min:6});
     req.checkBody('email', 'Email is required').notEmpty();
     req.checkBody('email', 'Email is not valid').isEmail();
     req.checkBody('password', 'Password is required').notEmpty();
@@ -22,33 +23,40 @@ router.post('/register', function(req, res, next) {
         res.send(errors);
         return;
     } else {
-        User.getUserByEmail(newUser.email, function(err, user){
+        User.getUserByUsername(newUser.username, function(err, user){
             if(err) throw err;
             if(user){
-                res.json({success: false, msg: 'User already exists'});
+                res.json([{param: 'username', msg: 'Username already exists'}]);
                 return;
             }
-        });
-        User.addUser(newUser, function(err, user){
-            if(err){
-                res.send(err);
-                return;
-            }
-            res.json({success: true, message: 'User has been registered'});
-        });
+            User.getUserByEmail(newUser.email, function(err, user){
+                if(err) throw err;
+                if(user){
+                    res.json([{param: 'email', msg: 'Email already exists'}]);
+                    return;
+                }
+                User.addUser(newUser, function(err, user){
+                    if(err){
+                        res.send(err);
+                        return;
+                    }
+                    res.json({success: true, msg: 'Successful created new user'});
+                });
+            });
+        });      
     }
 
 });
 
 router.post('/login', function(req, res, next) {
-    req.checkBody('email', 'Email is required').notEmpty();
+    req.checkBody('username', 'Username is required').notEmpty();
     req.checkBody('password', 'Password is required').notEmpty();
     var errors = req.validationErrors();
     if(errors){
-        res.send(errors);
+        res.send({success: false, message: errors[0].msg});
         return;
     }
-    User.getUserByEmail(req.body.email, function(err, user){
+    User.getUserByUsername(req.body.username, function(err, user){
         if(err){
             res.send(err);
             return;
@@ -57,40 +65,40 @@ router.post('/login', function(req, res, next) {
             res.json({success: false, message: 'User not found'});
             return;
         }
-        if(user.status != 'active'){
-            res.json({success: false, message: 'The account has not been verified'});
-            return;
-        }
-        else if (user.status == 'block'){
-            res.json({success: false, emessage: 'The account has been blocked'});
-            return;
-        }
-        else{
-            bcrypt.compareSync(req.body.password, user.password, function(err, isMatch){
-                if(err){
-                    res.send(err);
+        bcrypt.compare(req.body.password, user.password, function(err, isMatch){
+            if(err){
+                res.send(err);
+                return;
+            }
+            if(isMatch){
+                if(user.status == 'inactive'){
+                    res.json({success: false, message: 'The account has not been verified'});
                     return;
                 }
-                if(isMatch){
-                    var token = jwt.sign({
-                        id: _id, 
-                        role: user.role,
-                        name: user.name,
-                        email: user.email,
-                    }, 'secret', {
-                        expiresIn: 604800 // 1 week
-                    });
-                    res.json({
-                        success: true,
-                        user: user,
-                        access_token: token,
-                        message: 'User has been logged in'
-                    });
-                } else {
-                    res.json({success: false, message: 'Password is incorrect'});
+                else if (user.status == 'block'){
+                    res.json({success: false, message: 'The account has been blocked'});
+                    return;
                 }
-            });
-        }
+                var token = jwt.sign({
+                    id: user._id, 
+                    role: user.role,
+                    name: user.username,
+                    email: user.email,
+                }, 'secret', {
+                    algorithm: 'HS256',
+                    expiresIn: 604800 // 1 week
+                });
+                res.json({
+                    success: true,
+                    user: user,
+                    access_token: token,
+                    message: 'User has been logged in'
+                });
+                
+            } else {
+                res.json({success: false, message: 'Wrong password'});
+            }
+        });
     });
 });
 
@@ -126,8 +134,36 @@ router.post('/unblock', function(req, res, next) {
 });
 router.post('/delete', function(req, res, next) {
 });
-router.get('/verify', function(req, res, next) {
-    
+router.get('/activate/:username/:id', function(req, res, next) {
+    User.getUserByUsername(req.params.username, function(err, user){
+        if(err){
+            res.send(err);
+            return;
+        }
+        if(!user){
+            res.json({message: 'User not found'});
+            return;
+        }
+        if(user.status == 'active'){
+            res.json({message: 'The account has been activated'});
+            return;
+        }
+        if (user.status == 'block'){
+            res.json({message: 'The account has been blocked'});
+            return;
+        }
+        if (user._id == req.params.id){
+            User.updateUserStatus(user._id, 'active', function(err, user){
+                if(err){
+                    res.send(err);
+                    return;
+                }
+                res.json({message: 'The account has been activated'});
+            });
+        } else {
+            res.json({message: 'The activation link is invalid'});
+        }
+    });
 });
 
 

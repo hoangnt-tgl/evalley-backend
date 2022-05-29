@@ -1,17 +1,37 @@
 var express = require('express');
-
+var bodyParser = require('body-parser');
+var expressValidator = require('express-validator');
 var app = express();
-
+app.use(bodyParser.json());
+var cors = require('cors');
+app.use(cors());
 
 var port = process.env.PORT || 3000;
 app.set('port', port);
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+app.use(expressValidator({
+    errorFormatter: function(param, msg, value) {
+        var namespace = param.split('.')
+        , root    = namespace.shift()
+        , formParam = root;
+  
+      while(namespace.length) {
+        formParam += '[' + namespace.shift() + ']';
+      }
+      return {
+        param : formParam,
+        msg   : msg,
+        value : value
+      };
+    }
+}));
+
+
 var user = require('./routes/user');
 var province = require('./routes/province');
 var voucher = require('./routes/voucher');
 var product = require('./routes/product');
-
 
 app.use('/user', user);
 app.use('/province', province);

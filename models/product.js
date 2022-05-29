@@ -24,6 +24,10 @@ var ProductSchema = mongoose.Schema({
     origin: {
         type: String,
     },
+    quantity: {
+        type: Number,
+    },
+
     created_at: {
         type: Date,
         default: Date.now
