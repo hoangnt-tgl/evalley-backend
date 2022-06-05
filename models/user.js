@@ -1,7 +1,7 @@
 var mongoose = require("mongoose")
 var bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer')
-const BASE_URL = 'http://localhost:3000/';
+const BASE_URL = "https://evalley.netlify.app/"
 
 let transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -84,7 +84,7 @@ const SendMail = (email, username, id) => {
             html: `<h1>Welcome to Shopping With Valley</h1>
             <p>Your account has been created</p>
             <p>Username: ${username}</p>
-            <p>Please click <a href="${BASE_URL}user/activate/${username}/${id}">here</a> to verify your account</p>`
+            <p>Please click <a href="${BASE_URL}activate/${username}/${id}">here</a> to verify your account</p>`
         }
         transporter.sendMail(mailOptions, (error, info) => {
             if (error) {
@@ -130,3 +130,21 @@ module.exports.updateUserStatus = function(id, status, callback){
     var update = {status: status};
     User.findOneAndUpdate(query, update, callback);
 }
+module.exports.updateUser = function(id, update, callback){
+    var query = {_id: id};
+    User.findOneAndUpdate(query, update, callback);
+}
+module.exports.updateUserPassword = function(id, password, callback){
+    var query = {_id: id};
+    bcrypt.genSalt(10, function(err, salt) {
+        bcrypt.hash(password, salt, function(err, hash) {
+            var update = {password: hash};
+            User.findOneAndUpdate(query, update, callback);
+        });
+    });
+}
+module.exports.deleteUser = function(id, callback){
+    var query = {_id: id};
+    User.deleteOne(query, callback);
+}
+

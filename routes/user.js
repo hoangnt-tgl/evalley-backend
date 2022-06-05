@@ -134,8 +134,8 @@ router.post('/unblock', function(req, res, next) {
 });
 router.post('/delete', function(req, res, next) {
 });
-router.get('/activate/:username/:id', function(req, res, next) {
-    User.getUserByUsername(req.params.username, function(err, user){
+router.post('/activate', function(req, res, next) {
+    User.getUserByUsername(req.body.username, function(err, user){
         if(err){
             res.send(err);
             return;
@@ -144,15 +144,11 @@ router.get('/activate/:username/:id', function(req, res, next) {
             res.json({message: 'User not found'});
             return;
         }
-        if(user.status == 'active'){
-            res.json({message: 'The account has been activated'});
-            return;
-        }
         if (user.status == 'block'){
             res.json({message: 'The account has been blocked'});
             return;
         }
-        if (user._id == req.params.id){
+        if (user._id == req.body.id){
             User.updateUserStatus(user._id, 'active', function(err, user){
                 if(err){
                     res.send(err);
@@ -165,8 +161,6 @@ router.get('/activate/:username/:id', function(req, res, next) {
         }
     });
 });
-
-
 
 
 module.exports = router;
