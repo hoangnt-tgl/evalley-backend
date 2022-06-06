@@ -12,6 +12,12 @@ var ProductSchema = mongoose.Schema({
     price_sale: {
         type: Number,
     },
+    sale_start: {
+        type: Date,
+    },
+    sale_end: {
+        type: Date,
+    },
     description: {
         type: String,
     },
