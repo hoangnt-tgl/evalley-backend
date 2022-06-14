@@ -2,8 +2,10 @@ var express = require('express');
 var bcrypt = require('bcryptjs');
 var jwt = require("jsonwebtoken");
 var router = express.Router();
+var Model = require('../models/manager');
 var User = require('../models/user');
-/* GET home page. */
+
+const SECRET = process.env.EVALLEY_SECRET;
 
 router.post('/register', function(req, res, next) {
     var newUser = new User({
@@ -81,20 +83,18 @@ router.post('/login', function(req, res, next) {
                 }
                 var token = jwt.sign({
                     id: user._id, 
-                    role: user.role,
-                    name: user.username,
-                    email: user.email,
-                }, 'secret', {
+                }, SECRET , {
                     algorithm: 'HS256',
                     expiresIn: 604800 // 1 week
                 });
                 res.json({
                     success: true,
-                    user: user,
+                    user: {
+                        id: user._id,
+                    },
                     access_token: token,
                     message: 'User has been logged in'
                 });
-                
             } else {
                 res.json({success: false, message: 'Wrong password'});
             }
@@ -102,20 +102,26 @@ router.post('/login', function(req, res, next) {
     });
 });
 
-router.post('/getinfo', function(req, res, next) {
-    User.getUserById(req.body.id, function(err, user){
+router.get('/getuser/:id', Model.checkLogin, function(req, res, next) {
+    User.getUserById(req.params.id, function(err, user){
+        if(err){
+            res.send(err);
+        } else if (!user) {
+            res.json({success: false, message: 'User not found'});
+        } else {
+            res.json({success: true, user: user});
+        }
+    });
+});
+router.get('/getall', Model.checkLogin, Model.checkAdmin, function(req, res, next){
+    User.getAllUser(function(err, users){
         if(err){
             res.send(err);
             return;
         }
-        if(!user){
-            res.json({message: 'User not found'});
-            return;
-        }
-        res.json(user);
+        res.json(users);
     });
 });
-
 router.post('/update', function(req, res, next) {
     return;
 });
@@ -129,10 +135,13 @@ router.post('/forgotpassword', function(req, res, next) {
 router.post('/resetpassword', function(req, res, next) {
 });
 router.post('/block', function(req, res, next) {
+    
 });
 router.post('/unblock', function(req, res, next) {
+
 });
 router.post('/delete', function(req, res, next) {
+
 });
 router.post('/activate', function(req, res, next) {
     User.getUserByUsername(req.body.username, function(err, user){

@@ -12,4 +12,22 @@ router.get('/getall', function(req, res, next) {
         }
     });
 });
+router.get('/detail/:id', function(req, res, next) {
+    Product.getProductById(req.params.id, function(err, product) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(product);
+        }
+    });
+});
+router.get('/available', function(req, res, next) {
+    Product.getProductAvailable(function(err, products) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(products);
+        }
+    });
+});
 module.exports = router;

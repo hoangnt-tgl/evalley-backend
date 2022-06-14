@@ -53,6 +53,13 @@ var Product = module.exports = mongoose.model('product', ProductSchema);
 module.exports.getAllProduct = function(callback){
     Product.find(callback);
 }
-
-
-
+module.exports.getProductById = function(id, callback){
+    Product.findById(id, callback);
+}
+module.exports.getProductAvailable = function(callback){
+    query = {
+        status: 'active',
+        quantity: {$gt: 0},
+    }
+    Product.find(query, callback);
+}

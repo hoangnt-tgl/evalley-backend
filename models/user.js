@@ -1,7 +1,9 @@
 var mongoose = require("mongoose")
 var bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer')
-const BASE_URL = "https://evalley.netlify.app/"
+require('dotenv').config();
+const SECRET = process.env.EVALLEY_SECRET;
+const BASE_URL = process.env.BASE_URL;
 
 let transporter = nodemailer.createTransport({
 	service: 'gmail',
@@ -37,6 +39,10 @@ var UserSchema = mongoose.Schema({
     password: {
         type: String,
         required: true
+    },
+    avatar: {
+        type: String,
+        default: 'https://thelifetank.com/wp-content/uploads/2018/08/avatar-default-icon.png'
     },
     birthday: {
         type: Date,
@@ -147,4 +153,6 @@ module.exports.deleteUser = function(id, callback){
     var query = {_id: id};
     User.deleteOne(query, callback);
 }
+
+
 
