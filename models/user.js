@@ -5,22 +5,22 @@ require('dotenv').config();
 const SECRET = process.env.EVALLEY_SECRET;
 const BASE_URL = process.env.BASE_URL;
 
-let transporter = nodemailer.createTransport({
-	service: 'gmail',
-	auth: {
-		user: 'shoppingwithevalley@gmail.com',
-		pass: 'nguyentronghoang'
-	}
-})
-transporter.verify((error, success) => {
-	if (error) {
-		console.log(error)
-	}
-	else {
-		console.log('Ready for message');
-		console.log(success);
-	}
-})
+// let transporter = nodemailer.createTransport({
+// 	service: 'gmail',
+// 	auth: {
+// 		user: 'shoppingwithevalley@gmail.com',
+// 		pass: 'nguyentronghoang'
+// 	}
+// })
+// transporter.verify((error, success) => {
+// 	if (error) {
+// 		console.log(error)
+// 	}
+// 	else {
+// 		console.log('Ready for message');
+// 		console.log(success);
+// 	}
+// })
 
 // User Schema
 var UserSchema = mongoose.Schema({
@@ -92,14 +92,14 @@ const SendMail = (email, username, id) => {
             <p>Username: ${username}</p>
             <p>Please click <a href="${BASE_URL}activate/${username}/${id}">here</a> to verify your account</p>`
         }
-        transporter.sendMail(mailOptions, (error, info) => {
-            if (error) {
-                console.log(error)
-            }
-            else {
-                console.log('Email sent: ' + info.response);
-            }
-        })
+        // transporter.sendMail(mailOptions, (error, info) => {
+        //     if (error) {
+        //         console.log(error)
+        //     }
+        //     else {
+        //         console.log('Email sent: ' + info.response);
+        //     }
+        // })
     })
 }
 

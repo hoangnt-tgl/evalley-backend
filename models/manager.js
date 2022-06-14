@@ -1,39 +1,44 @@
+var express = require('express');
 var User = require('./user');
 var Voucher = require('./voucher');
 var jwt = require("jsonwebtoken");
 const SECRET = process.env.EVALLEY_SECRET;
 
 module.exports.checkLogin = function (req, res, next) {
-    try {
-        var cookie = req.headers.cookie.split('; ');
-        var token = '';
-        cookie.forEach(function (item) {
-            if (item.split('=')[0] == 'token') {
-                token = item.split('=')[1];
-            }
-        });
-        var decoded = jwt.verify(token, SECRET);
-        id = decoded.id;
-        User.getUserById(id, function (err, user) {
+    var token = req.body.token;
+    if (token) {
+        jwt.verify(token, SECRET, function (err, decoded) {
             if (err) {
-                res.redirect('/');
-            } else {
-                req.body.user = user;
-                next();
+                res.json({ success: false, message: 'Failed to authenticate token.' });
+            }
+            else {
+                id = decoded.id;
+                User.getUserById(id, function (err, user) {
+                    if (err) {
+                        res.send({ success: false, message: 'Failed to authenticate token.' });
+                        return;
+                    }
+                    if (!user) {
+                        res.send({ success: false, message: 'No user found.' });
+                        return;
+                    }
+                    req.user = user;
+                    next();
+                });
             }
         });
     }
-    catch (err) {
-        res.redirect('/');
+    else {
+        res.json({ success: false, message: 'No token provided.' });
     }
 }
 
 module.exports.checkAdmin = function (req, res, next) {
-    if (req.body.user.role == 'admin') {
+    if (req.user.role == 'admin') {
         next();
     }
     else {
-        res.redirect('/');
+        res.json({ success: false, message: 'You are not admin' });
     }
 }
     

@@ -1,10 +1,10 @@
 var express = require('express');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
+var cors = require('cors');
 
 var app = express();
 app.use(bodyParser.json());
-var cors = require('cors');
 app.use(cors());
 
 var port = process.env.PORT || 3000;

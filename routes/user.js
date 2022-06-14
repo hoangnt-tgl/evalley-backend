@@ -102,18 +102,12 @@ router.post('/login', function(req, res, next) {
     });
 });
 
-router.get('/getuser/:id', Model.checkLogin, function(req, res, next) {
-    User.getUserById(req.params.id, function(err, user){
-        if(err){
-            res.send(err);
-        } else if (!user) {
-            res.json({success: false, message: 'User not found'});
-        } else {
-            res.json({success: true, user: user});
-        }
-    });
+router.post('/me', Model.checkLogin, function(req, res, next) {
+    var user = req.user;
+    user.password = undefined;
+    res.json({success: true, user: user});
 });
-router.get('/getall', Model.checkLogin, Model.checkAdmin, function(req, res, next){
+router.post('/getall', Model.checkLogin, Model.checkAdmin, function(req, res, next){
     User.getAllUser(function(err, users){
         if(err){
             res.send(err);
