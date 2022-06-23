@@ -19,6 +19,7 @@ router.post('/register', function(req, res, next) {
     req.checkBody('email', 'Email is not valid').isEmail();
     req.checkBody('password', 'Password is required').notEmpty();
     req.checkBody('password', 'Password must be at least 6 characters long').isLength({min:6});
+    req.checkBody('password2', 'Passwords do not match').equals(req.body.password);
 
     var errors = req.validationErrors();
     if(errors){
@@ -31,21 +32,18 @@ router.post('/register', function(req, res, next) {
                 res.json([{param: 'username', msg: 'Username already exists'}]);
                 return;
             }
-            User.getUserByEmail(newUser.email, function(err, user){
-                if(err) throw err;
-                if(user){
-                    res.json([{param: 'email', msg: 'Email already exists'}]);
-                    return;
-                }
-                User.addUser(newUser, function(err, user){
-                    if(err){
-                        res.send(err);
-                        return;
-                    }
-                    res.json({success: true, msg: 'Successful created new user'});
-                });
-            });
-        });      
+        });
+        User.getUserByEmail(newUser.email, function(err, user){
+            if(err) throw err;
+            if(user){
+                res.json([{param: 'email', msg: 'Email already exists'}]);
+                return;
+            }
+        });
+        User.addUser(newUser, function(err, user){
+            if(err) throw err;
+            res.json({success: true, msg: 'Successful created new user'});
+        });     
     }
 
 });
@@ -89,9 +87,7 @@ router.post('/login', function(req, res, next) {
                 });
                 res.json({
                     success: true,
-                    user: {
-                        id: user._id,
-                    },
+                    role: user.role,
                     access_token: token,
                     message: 'User has been logged in'
                 });
@@ -113,7 +109,7 @@ router.post('/getall', Model.checkLogin, Model.checkAdmin, function(req, res, ne
             res.send(err);
             return;
         }
-        res.json(users);
+        res.json({success: true, user: users});
     });
 });
 router.post('/update', function(req, res, next) {

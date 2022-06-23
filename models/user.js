@@ -5,22 +5,22 @@ require('dotenv').config();
 const SECRET = process.env.EVALLEY_SECRET;
 const BASE_URL = process.env.BASE_URL;
 
-// let transporter = nodemailer.createTransport({
-// 	service: 'gmail',
-// 	auth: {
-// 		user: 'shoppingwithevalley@gmail.com',
-// 		pass: 'nguyentronghoang'
-// 	}
-// })
-// transporter.verify((error, success) => {
-// 	if (error) {
-// 		console.log(error)
-// 	}
-// 	else {
-// 		console.log('Ready for message');
-// 		console.log(success);
-// 	}
-// })
+var transporter = nodemailer.createTransport({
+	host: 'mail.glowpacific.com',   // hostname
+    port: 25,    
+    auth: {
+        user: 'hoang.nguyen@glowpacific.com',
+        pass: 'Hoang@123'
+    }
+});
+
+// transporter.verify(function(error, success) {
+//     if (error) {
+//         console.log(error);
+//     } else {
+//         console.log('Server is ready to take our messages');
+//     }
+// });
 
 // User Schema
 var UserSchema = mongoose.Schema({
@@ -84,7 +84,7 @@ var User = module.exports = mongoose.model('user', UserSchema);
 const SendMail = (email, username, id) => {
     bcrypt.hash(username, 10, function(err, hash){
         var mailOptions = {
-            from: 'shoppingwithevalley@gmail.com',
+            from: 'hoang.nguyen@glowpacific.com',
             to: email,
             subject: 'Welcome to Shopping With Valley',
             html: `<h1>Welcome to Shopping With Valley</h1>
@@ -92,6 +92,7 @@ const SendMail = (email, username, id) => {
             <p>Username: ${username}</p>
             <p>Please click <a href="${BASE_URL}activate/${username}/${id}">here</a> to verify your account</p>`
         }
+        console.log(`${BASE_URL}activate/${username}/${id}`)
         // transporter.sendMail(mailOptions, (error, info) => {
         //     if (error) {
         //         console.log(error)
