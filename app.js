@@ -41,6 +41,9 @@ app.use('/voucher', voucher);
 app.use('/product', product);
 app.use('/category', category);
 
+app.use('/', (req, res) => {
+  res.send('Hello World!')
+})
 var mongoose = require("mongoose");
 mongoose.set('useNewUrlParser', true);
 mongoose.set('useFindAndModify', false);
