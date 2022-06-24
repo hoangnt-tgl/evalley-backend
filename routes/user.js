@@ -53,49 +53,46 @@ router.post('/login', function(req, res, next) {
     req.checkBody('password', 'Password is required').notEmpty();
     var errors = req.validationErrors();
     if(errors){
-        res.send({success: false, message: errors[0].msg});
-        return;
-    }
-    User.getUserByUsername(req.body.username, function(err, user){
-        if(err){
-            res.send(err);
-            return;
-        }
-        if(!user){
-            res.json({success: false, message: 'User not found'});
-            return;
-        }
-        bcrypt.compare(req.body.password, user.password, function(err, isMatch){
+        res.json({success: false, message: errors[0].msg});
+    } else {
+        User.getUserByUsername(req.body.username, function(err, user){
             if(err){
                 res.send(err);
-                return;
-            }
-            if(isMatch){
-                if(user.status == 'inactive'){
-                    res.json({success: false, message: 'The account has not been verified'});
-                    return;
-                }
-                else if (user.status == 'block'){
-                    res.json({success: false, message: 'The account has been blocked'});
-                    return;
-                }
-                var token = jwt.sign({
-                    id: user._id, 
-                }, SECRET , {
-                    algorithm: 'HS256',
-                    expiresIn: 604800 // 1 week
-                });
-                res.json({
-                    success: true,
-                    role: user.role,
-                    access_token: token,
-                    message: 'User has been logged in'
-                });
+            } else if(!user){
+                res.json({success: false, message: 'User not found'});
             } else {
-                res.json({success: false, message: 'Wrong password'});
+                bcrypt.compare(req.body.password, user.password, function(err, isMatch){
+                    if(err){
+                        res.send(err);
+                    } else if(isMatch){
+                        if(user.status == 'inactive'){
+                            res.json({success: false, message: 'The account has not been verified'});
+                        }
+                        else if (user.status == 'block'){
+                            res.json({success: false, message: 'The account has been blocked'});
+                        }
+                        else {
+                            var token = jwt.sign({
+                                id: user._id, 
+                            }, SECRET , {
+                                algorithm: 'HS256',
+                                expiresIn: 604800 // 1 week
+                            });
+                            res.json({
+                                success: true,
+                                role: user.role,
+                                access_token: token,
+                                message: 'User has been logged in'
+                            });
+                        }
+                        
+                    } else {
+                        res.json({success: false, message: 'Wrong password'});
+                    }
+                });
             }
         });
-    });
+    }
 });
 
 router.post('/me', Model.checkLogin, function(req, res, next) {
