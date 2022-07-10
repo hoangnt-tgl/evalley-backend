@@ -27,23 +27,27 @@ router.post('/register', function(req, res, next) {
         return;
     } else {
         User.getUserByUsername(newUser.username, function(err, user){
-            if(err) console.log(err)
+            if(err) res.send(err);
             if(user){
                 res.json([{param: 'username', msg: 'Username already exists'}]);
-                return;
+            }
+            else {
+                User.getUserByEmail(newUser.email, function(err, user){
+                    if(err) res.send(err);
+                    if(user){
+                        res.json([{param: 'email', msg: 'Email already exists'}]);
+                    }
+                    else {
+                        User.addUser(newUser, function(err, user){
+                            if(err) console.log(err);
+                            res.json({success: true, msg: 'Successful created new user'});
+                        });  
+                    }
+                });
             }
         });
-        User.getUserByEmail(newUser.email, function(err, user){
-            if(err) console.log(err);
-            if(user){
-                res.json([{param: 'email', msg: 'Email already exists'}]);
-                return;
-            }
-        });
-        User.addUser(newUser, function(err, user){
-            if(err) console.log(err);
-            res.json({success: true, msg: 'Successful created new user'});
-        });     
+        
+           
     }
 
 });
