@@ -13,7 +13,7 @@ var ProvinceSchema = mongoose.Schema({
             name: String,
             pre: String,
         }],
-        street: Array,
+        street: [],
     }]
 });
 

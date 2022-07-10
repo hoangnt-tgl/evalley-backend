@@ -34,7 +34,7 @@ module.exports.checkLogin = function (req, res, next) {
 }
 
 module.exports.checkAdmin = function (req, res, next) {
-    if (req.user.role == 'admin') {
+    if (req.user.role == 'admin' || req.user.role == 'staff') {
         next();
     }
     else {

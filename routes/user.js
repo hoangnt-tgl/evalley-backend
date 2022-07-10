@@ -104,7 +104,7 @@ router.post('/me', Model.checkLogin, function(req, res, next) {
     user.password = undefined;
     res.json({success: true, user: user});
 });
-router.post('/getall', Model.checkLogin, Model.checkAdmin, function(req, res, next){
+router.post('/getall', function(req, res, next){
     User.getAllUser(function(err, users){
         if(err){
             res.send(err);
