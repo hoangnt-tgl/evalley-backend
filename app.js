@@ -9,8 +9,13 @@ app.use(cors());
 
 var port = process.env.PORT || 3000;
 app.set('port', port);
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
 
+let server = app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+
+server.on('clientError', (err, socket) => {
+  console.error(err);
+  socket.end('HTTP/1.1 400 Bad Request\r\n\r\n');
+});
 app.use(expressValidator({
     errorFormatter: function(param, msg, value) {
         var namespace = param.split('.')
