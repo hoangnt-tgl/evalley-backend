@@ -5,29 +5,15 @@ var ProvinceSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    name: {
-        type: String,
-    },
+    name: String,
     district: [{
-        name: {
-            type: String,
-        },
-        pre: {
-            type: String,
-        },
+        name: String,
+        pre: String,
         ward: [{
-            name: {
-                type: String,
-            },
-            pre: {
-                type: String,
-            }
+            name: String,
+            pre: String,
         }],
-        street: [{
-            name: {
-                type: String,
-            }
-        }]
+        street: Array,
     }]
 });
 
