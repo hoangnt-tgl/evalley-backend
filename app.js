@@ -2,6 +2,7 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var expressValidator = require('express-validator');
 var cors = require('cors');
+require('dotenv').config();
 
 var app = express();
 app.use(bodyParser.json());
@@ -52,7 +53,7 @@ mongoose.set('useFindAndModify', false);
 mongoose.set('useCreateIndex', true);
 mongoose.set('useUnifiedTopology', true);
 
-const uri = 'mongodb+srv://hoanghoang:hoanghoang123@cluster0.gznnk.mongodb.net/evalley?retryWrites=true&w=majority';
+const uri = process.env.DATABASE;
 const options = {
     keepAlive: true,
     keepAliveInitialDelay: 300000,
