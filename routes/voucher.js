@@ -4,30 +4,34 @@ var Voucher = require('../models/voucher');
 var User = require('../models/user');
 /* GET home page. */
 
-router.post('/getall', function(req, res, next) {
-    User.getUserById(req.body.userId, function(err, user) {
+router.post('/new', function(req, res, next){
+    var voucher = req.body.voucher;
+    Voucher.createVoucher(voucher, function(err, voucher){
         if (err) {
             res.json(err);
-        } else if (!user) {
-            res.json({message: 'User not found'});
         } else {
-            if (user.role == 'admin') {
-                Voucher.getAllVoucher(function(err, vouchers) {
-                    if (err) {
-                        res.json(err);
-                    } else {
-                        res.json(vouchers);
-                    }
-                });
-            } else {
-                Voucher.getAllVoucherByUserId(req.body.userId, function(err, vouchers) {
-                    if (err) {
-                        res.json(err);
-                    } else {
-                        res.json(vouchers);
-                    }
-                });
-            }
+            res.json(voucher)
+        }
+    })
+})
+
+router.post('/getall', function(req, res, next) {
+    Voucher.getAllVoucher(function(err, vouchers) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(vouchers);
+        }
+    });
+});
+
+router.post('/delete', function(req, res, next) {
+    var selected = req.body.selected;
+    Voucher.deleteVoucher(selected, function(err, vouchers) {
+        if (err) {
+            res.json(err);
+        } else {
+            res.json(vouchers);
         }
     });
 });

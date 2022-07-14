@@ -13,6 +13,9 @@ var ReviewSchema = mongoose.Schema({
     createdAt: {
         type: Date
     },
+    rating: {
+        type: Number 
+    },
     reply: [
         {
             username: String,

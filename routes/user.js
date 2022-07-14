@@ -113,6 +113,7 @@ router.post('/getall', function(req, res, next){
         res.json({success: true, user: users});
     });
 });
+
 router.post('/update', function(req, res, next) {
     return;
 });
