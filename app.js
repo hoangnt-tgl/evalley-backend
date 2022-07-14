@@ -40,12 +40,17 @@ var province = require('./routes/province');
 var voucher = require('./routes/voucher');
 var product = require('./routes/product');
 var category = require('./routes/category');
+var review = require('./routes/review');
+var countrycode = require('./routes/countrycode');
 
 app.use('/user', user);
 app.use('/province', province);
 app.use('/voucher', voucher);
 app.use('/product', product);
 app.use('/category', category);
+app.use('/review', review);
+app.use('/country', countrycode);
+
 
 var mongoose = require("mongoose");
 mongoose.set('useNewUrlParser', true);

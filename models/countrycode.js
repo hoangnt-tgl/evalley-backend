@@ -1,14 +1,9 @@
 var mongoose = require("mongoose")
 // Voucher Schema
 var CountrycodeSchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    parent: {
-        type: String,
-        default: 'root'
-    },
+    name: String,
+    dial_code: String,
+    code: String
 });
 
 var Countrycode = module.exports = mongoose.model('countrycode', CountrycodeSchema);
