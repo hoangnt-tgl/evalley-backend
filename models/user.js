@@ -4,14 +4,14 @@ const nodemailer = require('nodemailer')
 require('dotenv').config();
 const SECRET = process.env.EVALLEY_SECRET;
 const BASE_URL = process.env.BASE_URL;
-
+const PASS = process.env.EMAIL_PASSWORD
 var transporter = nodemailer.createTransport({
 	host: 'mail.glowpacific.com',   // hostname
     port: 465, 
     secure: true,   
     auth: {
         user: 'hoang.nguyen@glowpacific.com',
-        pass: 'Hoang@123'
+        pass: PASS
     },
     tls: {
         rejectUnauthorized: false
@@ -145,9 +145,9 @@ module.exports.updateUserPassword = function(id, password, callback){
         });
     });
 }
-module.exports.deleteUser = function(id, callback){
-    var query = {_id: id};
-    User.deleteOne(query, callback);
+module.exports.deleteUser = function(selected, callback){
+    var query = {_id: { $in: selected}};
+    User.deleteMany(query, callback);
 }
 
 

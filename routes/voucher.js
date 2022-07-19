@@ -1,7 +1,6 @@
 var express = require('express');
 var router = express.Router();
 var Voucher = require('../models/voucher');
-var User = require('../models/user');
 /* GET home page. */
 
 router.post('/new', function(req, res, next){
