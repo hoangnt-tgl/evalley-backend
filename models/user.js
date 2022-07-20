@@ -4,7 +4,7 @@ const nodemailer = require('nodemailer')
 
 const SECRET = process.env.EVALLEY_SECRET;
 const BASE_URL = process.env.BASE_URL;
-const PASS = process.env.EMAIL_PASSWORD
+const PASS = process.env.EMAIL_PASSWORD;
 var transporter = nodemailer.createTransport({
 	host: 'mail.glowpacific.com',   // hostname
     port: 465, 
