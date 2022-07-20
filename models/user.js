@@ -1,7 +1,7 @@
 var mongoose = require("mongoose")
 var bcrypt = require('bcryptjs');
 const nodemailer = require('nodemailer')
-require('dotenv').config();
+
 const SECRET = process.env.EVALLEY_SECRET;
 const BASE_URL = process.env.BASE_URL;
 const PASS = process.env.EMAIL_PASSWORD
