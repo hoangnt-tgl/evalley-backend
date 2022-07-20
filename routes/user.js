@@ -114,6 +114,17 @@ router.post('/getall', function(req, res, next){
     });
 });
 
+router.post('/delete', function(req, res, next) {
+    var selected = req.body.selected
+    User.deleteUser(selected, function(err, users){
+        if(err){
+            res.send(err);
+        } else {
+            res.json({success: true, message: 'Delete successfull'});
+        }
+    });
+});
+
 router.post('/update', function(req, res, next) {
     return;
 });
@@ -132,16 +143,7 @@ router.post('/block', function(req, res, next) {
 router.post('/unblock', function(req, res, next) {
 
 });
-router.post('/delete', function(req, res, next) {
-    var selected = req.body.selected
-    User.deleteUser(selected, function(err, users){
-        if(err){
-            res.send(err);
-        } else {
-            res.json({success: true, message: 'Delete successfull'});
-        }
-    });
-});
+
 router.post('/activate', function(req, res, next) {
     User.getUserByUsername(req.body.username, function(err, user){
         if(err){
