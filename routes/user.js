@@ -4,7 +4,7 @@ var jwt = require("jsonwebtoken");
 var router = express.Router();
 var Model = require('../models/manager');
 var User = require('../models/user');
-
+require('dotenv').config();
 const SECRET = process.env.EVALLEY_SECRET;
 
 router.post('/register', function(req, res, next) {

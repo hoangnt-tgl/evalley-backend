@@ -64,4 +64,6 @@ const options = {
 mongoose.connect(uri, options)
 .then(() => console.log('MongoDB Connected'))
 .catch(err => console.log(err));
+
+console.log(process.env.DATABASE)
 module.exports = app;

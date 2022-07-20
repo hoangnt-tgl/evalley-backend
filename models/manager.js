@@ -2,6 +2,7 @@ var express = require('express');
 var User = require('./user');
 var Voucher = require('./voucher');
 var jwt = require("jsonwebtoken");
+require('dotenv').config();
 const SECRET = process.env.EVALLEY_SECRET;
 
 module.exports.checkLogin = function (req, res, next) {
