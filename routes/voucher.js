@@ -4,12 +4,33 @@ var Voucher = require('../models/voucher');
 /* GET home page. */
 
 router.post('/new', function(req, res, next){
-    var voucher = req.body.voucher;
-    Voucher.createVoucher(voucher, function(err, voucher){
+    var voucher = new Voucher({
+        title: req.body.title,
+        code: req.body.code,
+        discount: req.body.discount,
+        startdate: req.body.startdate,
+        enddate: req.body.enddate,
+        freeshipping: req.body.freeshipping,
+        quantity: req.body.quantity,
+        status: req.body.status,
+        minspend: req.body.minspend,
+        maxdiscount: req.body.maxdiscount,
+        category: req.body.category,
+        type: req.body.type
+    }) ;
+    Voucher.getVoucherByCode(voucher.code, function(err, result){
         if (err) {
             res.json(err);
+        } else if (result) {
+            res.json({success: false, message: 'Coupon Code already exists'})
         } else {
-            res.json(voucher)
+            Voucher.createVoucher(voucher, function(err, voucher){
+                if (err) {
+                    res.json(err);
+                } else {
+                    res.json({success: true, message: 'Create Coupon success'})
+                }
+            })
         }
     })
 })

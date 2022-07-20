@@ -13,10 +13,7 @@ var VoucherSchema = mongoose.Schema({
         type: Number,
         required: true
     },
-    startdate: {
-        type: Date,
-        default: Date.now
-    },
+    startdate: Date,
     enddate: Date,
     freeshipping: Boolean,
     quantity: Number,
@@ -32,7 +29,9 @@ var Voucher = module.exports = mongoose.model('voucher', VoucherSchema);
 module.exports.getAllVoucher = function(callback){
     Voucher.find(callback);
 }
-
+module.exports.getVoucherByCode = function(code, callback){
+    Voucher.findOne({code: code}, callback);
+}
 module.exports.deleteVoucher = function(selected, callback){
     Voucher.deleteMany({_id: {$in: selected}}, callback)
 }
