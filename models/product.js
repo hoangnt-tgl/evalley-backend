@@ -1,4 +1,3 @@
-var express = require('express')
 var db = require('../connect')
 
 module.exports.getAllProduct = function(callback){
