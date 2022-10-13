@@ -1,15 +1,15 @@
 
 var mysql = require('mysql')
 
-// const HOST = process.env.HOST 
-// const USER = process.env.USER 
-// const PASS = process.env.PASS 
-// const DATABASE = process.env.DATABASE
+const HOST = process.env.HOST 
+const USER = process.env.USER 
+const PASS = process.env.PASS 
+const DATABASE = process.env.DATABASE
 
-const HOST = "us-cdbr-east-06.cleardb.net"
-const USER = "b31dd452c4bb27"
-const PASS = "fb488890"
-const DATABASE = "heroku_6965ea3352c823d"
+// const HOST = "34.132.211.254"
+// const USER = "root"
+// const PASS = "hoang1234"
+// const DATABASE = "online_shopping"
 
 module.exports.connectDB = function (callback){
     const conn = mysql.createConnection({

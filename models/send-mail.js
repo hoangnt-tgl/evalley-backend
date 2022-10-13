@@ -1,7 +1,7 @@
 const nodemailer = require('nodemailer')
 
-const EMAIL_ADDRESS = process.env.EMAIL_ADDRESS || 'hoang.nguyen@glowpacific.com';
-const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD || 'matkhaunaykhongdung';
+const EMAIL_ADDRESS = process.env.EMAIL_ADDRESS;
+const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
 
 var transporter = nodemailer.createTransport({
 	host: 'mail.glowpacific.com',   // hostname
@@ -16,14 +16,14 @@ var transporter = nodemailer.createTransport({
     }
 });
 
-// transporter.verify((error, success) => {
-// 	if (error) {
-// 		console.log(error)
-// 	}
-// 	else {
-// 		console.log('Ready for message');
-// 	}
-// })
+transporter.verify((error, success) => {
+	if (error) {
+		console.log(error)
+	}
+	else {
+		console.log('Ready for message');
+	}
+})
 
 module.exports.sendMail = function(email, subject, body, callback){
     var mailOptions = {
