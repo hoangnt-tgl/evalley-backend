@@ -47,22 +47,8 @@ app.use('/category', category);
 app.use('/review', review);
 app.use('/country', countrycode);
 
-
-var mongoose = require("mongoose");
-mongoose.set('useNewUrlParser', true);
-mongoose.set('useFindAndModify', false);
-mongoose.set('useCreateIndex', true);
-mongoose.set('useUnifiedTopology', true);
-
-const uri = process.env.DATABASE;
-const options = {
-    keepAlive: true,
-    keepAliveInitialDelay: 300000,
-    useNewUrlParser: true
-};
-
-mongoose.connect(uri, options)
-.then(() => console.log('MongoDB Connected'))
-.catch(err => console.log(err));
+app.get('/', (req, res) => {
+  res.send('Hello world!')
+})
 
 module.exports = app;

@@ -1,33 +1,26 @@
 var express = require('express');
 var router = express.Router();
 var Product = require('../models/product');
-/* GET home page. */
 
 router.get('/getall', function(req, res, next) {
-    Product.getAllProduct(function(err, products) {
-        if (err) {
-            res.json(err);
-        } else {
-            res.json(products);
+    Product.getAllProduct(function(err, result){
+        if (err) res.status(500).json(err)
+        else if (result){
+            res.status(200).json(result)
         }
-    });
-});
-router.get('/detail/:id', function(req, res, next) {
-    Product.getProductById(req.params.id, function(err, product) {
-        if (err) {
-            res.json(err);
+    })
+})
+
+router.get('/detail/:id', function(req, res, next){
+    var id = req.params.id
+    Product.getProductById(id, function(err, result){
+        if (err) res.status(500).json(err)
+        else if (result.length > 0){
+            res.status(200).json(result[0])
         } else {
-            res.json(product);
+            res.status(404).json({message: "Not Found"})
         }
-    });
-});
-router.get('/available', function(req, res, next) {
-    Product.getProductAvailable(function(err, products) {
-        if (err) {
-            res.json(err);
-        } else {
-            res.json(products);
-        }
-    });
-});
-module.exports = router;
+    })
+})
+
+module.exports = router
