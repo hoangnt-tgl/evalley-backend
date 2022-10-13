@@ -2,7 +2,7 @@ var express = require('express')
 var db = require('../connect')
 
 module.exports.getAllProduct = function(callback){
-    var sql = `SELECT * from products`
+    var sql = `SELECT * from product`
     db.connectDB(function (err, connect){
         if (err) callback(err, null)
         else {
@@ -13,7 +13,7 @@ module.exports.getAllProduct = function(callback){
     
 }
 module.exports.getProductById = function(id , callback){
-    var sql = `SELECT * from products WHERE idproduct = ${id}`
+    var sql = `SELECT * from product WHERE idproduct = ${id}`
     db.connectDB(function (err, connect){
         if (err) callback(err, null)
         else {
