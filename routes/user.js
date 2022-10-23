@@ -2,7 +2,6 @@ var express = require('express');
 var bcrypt = require('bcryptjs');
 var jwt = require("jsonwebtoken");
 var router = express.Router();
-var Model = require('../models/manager');
 var User = require('../models/user');
 require('dotenv').config();
 const SECRET = process.env.EVALLEY_SECRET;
@@ -52,61 +51,68 @@ router.post('/register', function (req, res, next) {
 
 });
 
-router.post('/login', function (req, res, next) {
-    req.checkBody('username', 'Username is required').notEmpty();
-    req.checkBody('password', 'Password is required').notEmpty();
-    var errors = req.validationErrors();
-    if (errors) {
-        res.json({ success: false, message: errors[0].msg });
-    } else {
-        User.getUserByUsername(req.body.username, function (err, user) {
-            if (err) {
-                res.send(err);
-            } else if (!user) {
-                res.json({ success: false, message: 'User not found' });
-            } else {
-                bcrypt.compare(req.body.password, user.password, function (err, isMatch) {
-                    if (err) {
-                        res.send(err);
-                    } else if (isMatch) {
-                        if (user.status == 'inactive') {
-                            res.json({ success: false, message: 'The account has not been verified' });
-                        }
-                        else if (user.status == 'block') {
-                            res.json({ success: false, message: 'The account has been blocked' });
-                        }
-                        else {
-                            var token = jwt.sign({
-                                id: user._id,
-                            }, SECRET, {
-                                algorithm: 'HS256',
-                                expiresIn: 604800 // 1 week
-                            });
-                            res.json({
-                                success: true,
-                                role: user.role,
-                                access_token: token,
-                                message: 'User has been logged in'
-                            });
-                        }
+// router.post('/login', function (req, res, next) {
+//     User.getUserByUsername(req.body.username, function (err, user) {
+//         if (err) {
+//             res.status(500).json(err);
+//         } else if (user == []) {
+//             res.json({ success: false, message: 'User not found' });
+//         } else {
+//             user = user[0]
+//             User.comparePassword(req.body.password, user.password, function (err, isMatch) {
+//                 if (err) {
+//                     res.status(500).json(err);
+//                 } else if (isMatch) {
+//                     if (user.status == 'inactive') {
+//                         res.json({ success: false, message: 'The account has not been verified' });
+//                     }
+//                     else if (user.status == 'block') {
+//                         res.json({ success: false, message: 'The account has been blocked' });
+//                     }
+//                     else {
+//                         var token = jwt.sign({
+//                             id: user._id,
+//                             type: user.
+//                         }, SECRET, {
+//                             algorithm: 'HS256',
+//                             expiresIn: 604800 // 1 week
+//                         });
+//                         res.json({
+//                             success: true,
+//                             role: user.role,
+//                             access_token: token,
+//                             message: 'User has been logged in'
+//                         });
+//                     }
 
-                    } else {
-                        res.json({ success: false, message: 'Wrong password' });
-                    }
-                });
-            }
-        });
-    }
-});
+//                 } else {
+//                     res.json({ success: false, message: 'Wrong password' });
+//                 }
+//             });
+//         }
+//     });
 
-router.post('/me', Model.checkLogin, function (req, res, next) {
-    var user = req.user;
-    user.password = undefined;
-    res.json({ success: true, user: user });
-});
+// });
 
-router.get('/getall', function (req, res, next) {
+// router.get('/me', function (req, res, next) {
+//     var user = req.user;
+//     user.password = undefined;
+//     res.json({ success: true, user: user });
+// });
+
+router.get('/getall', User.checkAdmin,  function (req, res, next) {
+    
     User.getAllUser(function (err, users) {
+        if (err) { res.status(500).json(err) }
+        else {
+            res.status(200).json(users)
+        }
+    });
+});
+
+router.get('/get-by-username/:username', function (req, res, next) {
+    var username = req.params.username
+    User.getUserByUsername(username, function (err, users) {
         if (err) { res.status(500).json(err) }
         else {
             res.status(200).json(users)

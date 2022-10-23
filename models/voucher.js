@@ -29,7 +29,7 @@ module.exports.deleteVoucher = function (selected, callback) {
 
 module.exports.createVoucher = function (voucher, callback) {
     var sql = `INSERT INTO voucher (voucher_id, voucher_ispercent, voucher_isshipping, voucher_value, voucher_message, voucher_start_date, voucher_end_date, voucher_minspend, voucher_maxdiscount, voucher_quantity) 
-    VALUES(${voucher.code}, ${voucher.ispercent}, ${voucher.isshipping}, ${voucher.value}, ${voucher.message}, ${voucher.start_date}, ${voucher.end_date}, ${voucher.minspend}, ${voucher.maxdiscount}, ${voucher.quantity})`;
+    VALUES(${voucher.code}, ${voucher.ispercent}, ${voucher.freeshipping}, ${voucher.value}, ${voucher.title}, ${voucher.startdate}, ${voucher.enddate}, ${voucher.minspend}, ${voucher.maxdiscount}, ${voucher.quantity})`;
     db.connectDB(function (err, connect) {
         if (err) callback(err, null)
         else {
@@ -38,5 +38,4 @@ module.exports.createVoucher = function (voucher, callback) {
         }
     })
 }
-
 

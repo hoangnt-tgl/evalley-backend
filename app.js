@@ -30,7 +30,7 @@ app.use(expressValidator({
     }
 }));
 
-
+var usermodel = require('./models/user');
 var user = require('./routes/user');
 var voucher = require('./routes/voucher');
 var product = require('./routes/product');
@@ -41,6 +41,10 @@ var product = require('./routes/product');
 app.use('/user', user);
 app.use('/voucher', voucher);
 app.use('/product', product);
+// headers: {'Authorization': `Basic ${localStorage.getItem('token')}` }
+
+
+
 // app.use('/category', category);
 // app.use('/review', review);
 // app.use('/country', countrycode);

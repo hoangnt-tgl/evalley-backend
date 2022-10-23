@@ -3,57 +3,58 @@ var router = express.Router();
 var Voucher = require('../models/voucher');
 /* GET home page. */
 
-router.post('/new', function(req, res, next){
-    var voucher = new Voucher({
+router.post('/new', function (req, res, next) {
+    var voucher = {
         title: req.body.title,
         code: req.body.code,
-        discount: req.body.discount,
+        value: req.body.value,
         startdate: req.body.startdate,
         enddate: req.body.enddate,
         freeshipping: req.body.freeshipping,
         quantity: req.body.quantity,
-        status: req.body.status,
         minspend: req.body.minspend,
         maxdiscount: req.body.maxdiscount,
-        category: req.body.category,
-        type: req.body.type
-    }) ;
-    Voucher.getVoucherByCode(voucher.code, function(err, result){
+        ispercent: req.body.ispercent
+    };
+    Voucher.createVoucher(voucher, function (err, voucher) {
         if (err) {
-            res.json(err);
-        } else if (result) {
-            res.json({success: false, message: 'Coupon Code already exists'})
+            res.status(500).json(err);
         } else {
-            Voucher.createVoucher(voucher, function(err, voucher){
-                if (err) {
-                    res.json(err);
-                } else {
-                    res.json({success: true, message: 'Create Coupon success'})
-                }
-            })
+            res.status(200).json(voucher);
         }
     })
 })
 
-router.post('/getall', function(req, res, next) {
-    Voucher.getAllVoucher(function(err, vouchers) {
+router.get('/detail/:code', function (req, res, next) {
+    var code = req.params.code
+    Voucher.getVoucherByCode(code, function (err, vouchers) {
         if (err) {
-            res.json(err);
+            res.status(500).json(err);
         } else {
-            res.json(vouchers);
+            res.status(200).json(vouchers);
         }
     });
 });
 
-router.post('/delete', function(req, res, next) {
-    var selected = req.body.selected;
-    Voucher.deleteVoucher(selected, function(err, vouchers) {
+router.get('/getall', function (req, res, next) {
+    Voucher.getAllVoucher(function (err, vouchers) {
         if (err) {
-            res.json(err);
+            res.status(500).json(err);
         } else {
-            res.json({success: true, message: 'Delete successfull'});
+            res.status(200).json(vouchers);
         }
     });
 });
+
+// router.post('/delete', function (req, res, next) {
+//     var selected = req.body.selected;
+//     Voucher.deleteVoucher(selected, function (err, vouchers) {
+//         if (err) {
+//             res.status(500).json(err);
+//         } else {
+//             res.status(200).json(vouchers);
+//         }
+//     });
+// });
 
 module.exports = router;

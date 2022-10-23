@@ -1,9 +1,4 @@
-var express = require('express');
 var User = require('./user');
-var Voucher = require('./voucher');
-var jwt = require("jsonwebtoken");
-require('dotenv').config();
-const SECRET = process.env.EVALLEY_SECRET;
 
 module.exports.checkLogin = function (req, res, next) {
     var token = req.body.token;
@@ -33,13 +28,3 @@ module.exports.checkLogin = function (req, res, next) {
         res.json({ success: false, message: 'No token provided.' });
     }
 }
-
-module.exports.checkAdmin = function (req, res, next) {
-    if (req.user.role == 'admin' || req.user.role == 'staff') {
-        next();
-    }
-    else {
-        res.json({ success: false, message: 'You are not admin' });
-    }
-}
-    
