@@ -23,4 +23,8 @@ router.get('/detail/:id', function(req, res, next){
     })
 })
 
+
+
+
+
 module.exports = router

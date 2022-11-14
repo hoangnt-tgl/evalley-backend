@@ -1,21 +1,27 @@
-var mongoose = require("mongoose")
-// Voucher Schema
-var CategorySchema = mongoose.Schema({
-    name: {
-        type: String,
-        required: true
-    },
-    parent: {
-        type: String,
-        default: 'root'
-    },
-});
-
-var Category = module.exports = mongoose.model('category', CategorySchema);
-
+var db = require('../connect')
+// Lấy tất cả category
 module.exports.getAllCategory = function(callback){
-    Category.find(callback);
+    var sql = `SELECT * from category`
+    db.connectDB(function (err, connect){
+        if (err) callback(err, null)
+        else {
+            connect.query(sql, callback);
+            db.disconnectDB(connect)
+        }
+    })
 }
+// Lấy các category con của category cha theo id của cha
+module.exports.getAllCategory = function(id, callback){
+    var sql = `SELECT * from category WHERE parent_id = ${id}`
+    db.connectDB(function (err, connect){
+        if (err) callback(err, null)
+        else {
+            connect.query(sql, callback);
+            db.disconnectDB(connect)
+        }
+    })
+}
+
 
 
 

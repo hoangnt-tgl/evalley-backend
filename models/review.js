@@ -1,31 +1,32 @@
-var mongoose = require("mongoose")
-// Voucher Schema
-var ReviewSchema = mongoose.Schema({
-    product_id: {
-        type: String
-    },
-    username: {
-        type: String
-    },
-    message: {
-        type: String
-    },
-    createdAt: {
-        type: Date
-    },
-    rating: {
-        type: Number 
-    },
-    reply: [
-        {
-            username: String,
-            createdAt: Date,
-            message: String
+var db = require('../connect')
+// Lấy tất cả bình luận của sản phẩm theo id sản phẩm
+module.exports.getReviewByProductId = function(id, callback){
+    var sql = `SELECT * from review WHERE product_id = ${id}`
+    db.connectDB(function (err, connect){
+        if (err) callback(err, null)
+        else {
+            connect.query(sql, callback);
+            db.disconnectDB(connect)
         }
-    ]
-});
-
-var Review = module.exports = mongoose.model('review', ReviewSchema);
+    })
+}
+// Thêm bình luận sản phẩm
+module.exports.getReviewByProductId = function(user_id,product_id,comment,rating,datetime,review_parent,callback){
+    var sql = None
+    if (review_parent){
+        sql = `INSERT INTO review values(${user_id},${product_id},${comment},${datetime},${review_parent})`
+    }
+    else {
+        sql = `INSERT INTO review values(${user_id},${product_id},${comment},${rating},${datetime})`
+    }
+    db.connectDB(function (err, connect){
+        if (err) callback(err, null)
+        else {
+            connect.query(sql, callback);
+            db.disconnectDB(connect)
+        }
+    })
+}
 
 
 
