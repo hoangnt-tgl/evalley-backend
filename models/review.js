@@ -11,9 +11,9 @@ module.exports.getReviewByProductId = function(id, callback){
     })
 }
 // Thêm bình luận sản phẩm
-module.exports.getReviewByProductId = function(user_id,product_id,comment,rating,datetime,review_parent,callback){
+module.exports.addReview = function(user_id,product_id,comment,rating,datetime,review_parent,callback){
     var sql = None
-    if (review_parent){
+    if (review_parent != None){
         sql = `INSERT INTO review values(${user_id},${product_id},${comment},${datetime},${review_parent})`
     }
     else {

@@ -1,4 +1,5 @@
 var db = require('../connect')
+// Lấy tất cả các brand
 module.exports.getAllBrand = function(callback){
     var sql = `SELECT * from category`
     db.connectDB(function (err, connect){

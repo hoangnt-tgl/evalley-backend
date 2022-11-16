@@ -11,7 +11,7 @@ module.exports.getAllCategory = function(callback){
     })
 }
 // Lấy các category con của category cha theo id của cha
-module.exports.getAllCategory = function(id, callback){
+module.exports.getSubCategory = function(id, callback){
     var sql = `SELECT * from category WHERE parent_id = ${id}`
     db.connectDB(function (err, connect){
         if (err) callback(err, null)
