@@ -1,10 +1,10 @@
 
 var mysql = require('mysql')
 
-const HOST = process.env.HOST 
-const USER = process.env.USER 
-const PASS = process.env.PASS 
-const DATABASE = process.env.DATABASE
+const HOST = process.env.HOST || 'database-1.cwlufpqi7u2x.ap-northeast-1.rds.amazonaws.com';
+const USER = process.env.USER || 'admin';
+const PASS = process.env.PASS || 'tronghoang';
+const DATABASE = process.env.DATABASE || 'evalley';
 
 // const HOST = "34.132.211.254"
 // const USER = "root"
