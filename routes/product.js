@@ -56,7 +56,7 @@ router.get('/getAllProductByBrand/:id', function(req, res, next){
     })
 })
 // Lấy danh sách sản phẩm theo orgin id
-router.get('/getAllProductByBrand/:id', function(req, res, next){
+router.get('/getAllProductByOrigin/:id', function(req, res, next){
     var id = req.params.id
     Product.getProductByOriginId(id, function(err, result){
         if (err) res.status(500).json(err)
