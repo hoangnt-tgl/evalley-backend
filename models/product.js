@@ -24,7 +24,7 @@ module.exports.getProductById = function(id , callback){
 }
 //Lấy tất cả sản phẩm còn hàng ( hiển thị brand và category theo tên) 
 module.exports.getProductStocking = function(callback){
-    var sql = `SELECT * 
+    var sql = `SELECT product_id as id, product_title as title, product_image as image, cate_title as category, product_origin as origin, product_old_price as old_price, product_price as price, product_tag as tags, product_desc as description, product_brand as brand, product_quantity as stock
                FROM product a join category b on a.product_category = b.cate_id join brand c on a.product_brand = c.brand_id  
                WHERE product_quantity > 0`
     db.connectDB(function (err, connect){
