@@ -11,13 +11,13 @@ module.exports.getReviewByProductId = function(id, callback){
     })
 }
 // Thêm bình luận sản phẩm
-module.exports.addReview = function(user_id,product_id,comment,rating,datetime,review_parent,callback){
-    var sql = None
-    if (review_parent != None){
-        sql = `INSERT INTO review values(${user_id},${product_id},${comment},${datetime},${review_parent})`
+module.exports.addReview = function(user_id,product_id,comment,rating,review_parent,callback){
+    var sql = null
+    if (review_parent !== undefined){
+        sql = `INSERT INTO review(user_id,product_id,comment,rating,review_parent) values(${user_id},${product_id},${comment},${rating},${review_parent})`
     }
     else {
-        sql = `INSERT INTO review values(${user_id},${product_id},${comment},${rating},${datetime})`
+        sql = `INSERT INTO review(user_id,product_id,comment,rating) values(${user_id},${product_id},'${comment}',${rating})`
     }
     db.connectDB(function (err, connect){
         if (err) callback(err, null)
