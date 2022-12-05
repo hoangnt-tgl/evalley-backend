@@ -25,17 +25,18 @@ const SendMailForNewUser = (email, username, token) => {
 }
 
 
-module.exports.addUser = function (newUser, callback) {
+module.exports.addUser = function (username,email,password, callback) {
     bcrypt.genSalt(10, function (err, salt) {
-        bcrypt.hash(newUser.password, salt, function (err, hash) {
+        bcrypt.hash(password, salt, function (err, hash) {
             var token = jwt.sign({
-                username: newUser.username,
-            }, SECRET, {
+                username: username,
+            }, "SECRET", {
                 algorithm: 'HS256',
                 expiresIn: 600 // 1 week
             });
-            newUser.password = hash;
-            var sql = `INSERT INTO user (email, name, username, password, otptoken) VALUES (${newUser.email}, ${newUser.name}, ${newUser.username}, ${newUser.password}, ${token});`
+            // const token = generateAccessToken({ username: req.body.username });
+            password = hash;
+            var sql = `INSERT INTO user (email, username, password, otp_token) VALUES ("${email}", "${username}", "${password}", "${token}");`
             db.connectDB(function (err, connect) {
                 if (err) callback(err, null)
                 else {
@@ -43,13 +44,14 @@ module.exports.addUser = function (newUser, callback) {
                     db.disconnectDB(connect)
                 }
             })
+            SendMailForNewUser(email, username, token);
         });
     });
-    SendMailForNewUser(newUser.email, newUser.username, token);
+    
 }
 
 module.exports.getUserByEmail = function (email, callback) {
-    var sql = `SELECT * from user WHERE email = ${email}`
+    var sql = `SELECT * from user WHERE email = "${email}"`
     db.connectDB(function (err, connect) {
         if (err) callback(err, null)
         else {
@@ -58,6 +60,23 @@ module.exports.getUserByEmail = function (email, callback) {
         }
     })
 }
+module.exports.getUserByEmailOrUsername = function (username, callback) {
+    var sql =""
+    if(email.includes("@")){
+        sql = `SELECT * from user WHERE email = "${username}"`
+    }
+    else{
+        sql = `SELECT * from user WHERE username = "${username}"`
+    }
+    db.connectDB(function (err, connect) {
+        if (err) callback(err, null)
+        else {
+            connect.query(sql, callback);
+            db.disconnectDB(connect)
+        }
+    })
+}
+
 
 module.exports.getUserById = function (id, callback) {
     var sql = `SELECT * from user WHERE user_id = ${id}`
@@ -71,7 +90,7 @@ module.exports.getUserById = function (id, callback) {
 }
 
 module.exports.getUserByUsername = function (username, callback) {
-    var sql = `SELECT * from user WHERE username = ${username}`
+    var sql = `SELECT * from user WHERE username = "${username}"`
     db.connectDB(function (err, connect) {
         if (err) callback(err, null)
         else {

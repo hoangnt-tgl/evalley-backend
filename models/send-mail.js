@@ -1,22 +1,18 @@
+require('dotenv').config();
 const nodemailer = require('nodemailer')
 
-const EMAIL_ADDRESS = process.env.EMAIL_ADDRESS;
-const EMAIL_PASSWORD = process.env.EMAIL_PASSWORD;
+const EMAIL_ADDRESS = "plvhoang09@gmail.com";
+const EMAIL_PASSWORD = "phamluuvyhoang";
 
-var transporter = nodemailer.createTransport({
-	host: 'mail.glowpacific.com',   // hostname
-    port: 465, 
-    secure: true,   
+var transport = nodemailer.createTransport({
+    host: "smtp.mailtrap.io",
+    port: 2525,
     auth: {
-        user: EMAIL_ADDRESS,
-        pass: EMAIL_PASSWORD
-    },
-    tls: {
-        rejectUnauthorized: false
+      user: "239d11edb735c4",
+      pass: "5a098ce879c454"
     }
-});
-
-transporter.verify((error, success) => {
+  });
+ transport.verify((error, success) => {
 	if (error) {
 		console.log(error)
 	}
@@ -32,7 +28,7 @@ module.exports.sendMail = function(email, subject, body, callback){
         subject: subject,
         html: body
     }
-    transporter.sendMail(mailOptions, (error, info) => {
+    transport.sendMail(mailOptions, (error, info) => {
         if (error) {
             callback(null, false)
         }

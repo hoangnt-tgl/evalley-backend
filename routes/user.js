@@ -7,11 +7,11 @@ require('dotenv').config();
 const SECRET = process.env.EVALLEY_SECRET;
 
 router.post('/register', function (req, res, next) {
-    var newUser = new User({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
-    });
+    // var newUser = new User({
+    //     username: req.body.username,
+    //     email: req.body.email,
+    //     password: req.body.password,
+    // });
     req.checkBody('username', 'Username is required').notEmpty();
     req.checkBody('username', 'Username must be at least 6 characters long').isLength({ min: 6 });
     req.checkBody('email', 'Email is required').notEmpty();
@@ -25,19 +25,19 @@ router.post('/register', function (req, res, next) {
         res.send(errors);
         return;
     } else {
-        User.getUserByUsername(newUser.username, function (err, user) {
+        User.getUserByUsername(req.body.username, function (err, user) {
             if (err) res.send(err);
-            if (user) {
+            if (user.length > 0) {
                 res.json([{ param: 'username', msg: 'Username already exists' }]);
             }
             else {
-                User.getUserByEmail(newUser.email, function (err, user) {
+                User.getUserByEmail(req.body.email, function (err, user) {
                     if (err) res.send(err);
-                    if (user) {
+                    if (user.length > 0) {
                         res.json([{ param: 'email', msg: 'Email already exists' }]);
                     }
                     else {
-                        User.addUser(newUser, function (err, user) {
+                        User.addUser(req.body.username,req.body.email,req.body.password, function (err, user) {
                             if (err) console.log(err);
                             res.json({ success: true, msg: 'Successful created new user' });
                         });
@@ -149,32 +149,68 @@ router.post('/unblock', function (req, res, next) {
 
 });
 
-router.post('/activate', function (req, res, next) {
-    User.getUserByUsername(req.body.username, function (err, user) {
+// router.post('/activate', function (req, res, next) {
+//     User.getUserByUsername(req.body.username, function (err, user) {
+//         if (err) {
+//             res.send(err);
+//             return;
+//         }
+//         if (!user) {
+//             res.json({ message: 'User not found' });
+//             return;
+//         }
+//         if (user.status == 'block') {
+//             res.json({ message: 'The account has been blocked' });
+//             return;
+//         }
+//         if (user.user_id == req.body.id) {
+//             User.updateUserStatus(user.user_id, 'active', function (err, user) {
+//                 if (err) {
+//                     res.send(err);
+//                     return;
+//                 }
+//                 res.json({ message: 'The account has been activated' });
+//             });
+//         } else {
+//             res.json({ message: 'The activation link is invalid' });
+//         }
+//     });
+// });
+router.post('/login',function(req,res,next){
+    var username_email = req.body.username;
+    User.getUserByEmailOrUsername(username_email,function(err,user){
         if (err) {
-            res.send(err);
-            return;
+            res.status(500).json(err);
         }
-        if (!user) {
-            res.json({ message: 'User not found' });
-            return;
+        else if (user == []) {
+            res.json({ success: false, message: 'User not found' });
         }
-        if (user.status == 'block') {
-            res.json({ message: 'The account has been blocked' });
-            return;
-        }
-        if (user._id == req.body.id) {
-            User.updateUserStatus(user._id, 'active', function (err, user) {
+        else {
+            user = user[0]
+            User.comparePassword(req.body.password, user.password, function(err, isMatch) {
                 if (err) {
-                    res.send(err);
-                    return;
+                    res.status(500).json(err);
+                } else if (isMatch) {
+                    // var token = jwt.sign({
+                    //     id: user.user_id,
+                    //     type: user.permission
+                    // }, "SECRET", {
+                    //     algorithm: 'HS256',
+                    //     expiresIn: 604800 // 1 week
+                    // });
+                    res.json({
+                        success: true,
+                        // role: user.permission,
+                        // access_token: token,
+                        message: 'User has been logged in'
+                    });
+                    
+                } else {
+                    res.json({ success: false, message: 'Wrong password' });
                 }
-                res.json({ message: 'The account has been activated' });
-            });
-        } else {
-            res.json({ message: 'The activation link is invalid' });
+            })
         }
-    });
+    })
 });
 
 
