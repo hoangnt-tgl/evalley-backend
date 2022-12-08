@@ -11,3 +11,4 @@ router.get('/getallCategory', function(req, res, next) {
         }
     });
 });
+module.exports = router;

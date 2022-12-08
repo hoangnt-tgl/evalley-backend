@@ -34,19 +34,21 @@ var usermodel = require('./models/user');
 var user = require('./routes/user');
 var voucher = require('./routes/voucher');
 var product = require('./routes/product');
-// var category = require('./routes/category');
-// var review = require('./routes/review');
+var brand = require('./routes/brand');
+var category = require('./routes/category');
+var review = require('./routes/review');
 // var countrycode = require('./routes/countrycode');
 
 app.use('/user', user);
 app.use('/voucher', voucher);
 app.use('/product', product);
+app.use('/brand', brand);
 // headers: {'Authorization': `Basic ${localStorage.getItem('token')}` }
 
 
 
-// app.use('/category', category);
-// app.use('/review', review);
+app.use('/category', category);
+app.use('/review', review);
 // app.use('/country', countrycode);
 
 app.get('/', (req, res) => {

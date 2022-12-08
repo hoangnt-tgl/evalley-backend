@@ -1,15 +1,14 @@
-
 var mysql = require('mysql')
 
-const HOST = process.env.HOST 
-const USER = process.env.USER 
-const PASS = process.env.PASS 
-const DATABASE = process.env.DATABASE
+// const HOST = process.env.HOST 
+// const USER = process.env.USER 
+// const PASS = process.env.PASS 
+// const DATABASE = process.env.DATABASE
 
-// const HOST = "34.132.211.254"
-// const USER = "root"
-// const PASS = "hoang1234"
-// const DATABASE = "online_shopping"
+const HOST = "database-1.cwlufpqi7u2x.ap-northeast-1.rds.amazonaws.com"
+const USER = "admin"
+const PASS = "tronghoang"
+const DATABASE = "online_shopping"
 
 module.exports.connectDB = function (callback){
     const conn = mysql.createConnection({
@@ -26,7 +25,6 @@ module.exports.connectDB = function (callback){
             callback(null, conn)
         }
     })
-
 }
 
 module.exports.disconnectDB = function (conn) {

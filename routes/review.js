@@ -17,12 +17,12 @@ router.get('/getAllReview/:id', function(req, res, next){
 })
 // Thêm bình luận sản phẩm user_id,product_id,comment,rating,datetime,review_parent
 router.post('/addReview', function(req, res, next){
-    var user_id = req.body.user_id?req.body.user_id:None
-    var product_id = req.body.product_id?req.body.product_id:None
-    var comment = req.body.comment?req.body.comment:None
-    var rating = req.body.rating?req.body.rating:None
-    var review_parent = req.body.review_parent?req.body.review_parent:None
-    if (comment == None){
+    var user_id = req.body.user_id;
+    var product_id = req.body.product_id;
+    var comment = req.body.comment;
+    var rating = req.body.rating;
+    var review_parent = req.body.review_parent;
+    if (comment === undefined){
         res.json({ message: 'Please input some text to review this product!' });
         return;
     }
