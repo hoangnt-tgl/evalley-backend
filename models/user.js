@@ -34,7 +34,7 @@ module.exports.addUser = function (username, email, password, callback) {
         {
           OTP: OTP,
         },
-        SECRET,
+        "SECRET",
         {
           algorithm: "HS256",
           expiresIn: 600,
@@ -53,6 +53,38 @@ module.exports.addUser = function (username, email, password, callback) {
     });
   });
 };
+// Tạo token mới để cập nhật password
+module.exports.updateToken = function (email,username, callback) {
+  let OTP = "";
+  for (let i = 0; i < 6; i++) {
+    OTP += DIGITS[Math.floor(Math.random() * 10)];
+  }
+  var token = jwt.sign(
+    {
+      OTP: OTP,
+    },
+    "SECRET",
+    {
+      algorithm: "HS256",
+      expiresIn: 600,
+    }
+  );
+  var sql =   ` UPDATE user
+                SET otp_token = "${token}"
+                WHERE email = "${email}"
+  `;
+  db.connectDB(function (err, connect) {
+    if (err) callback(err, null);
+    else {
+      connect.query(sql, callback);
+      sendOTP(email, username, OTP);
+      db.disconnectDB(connect);
+    }
+  }); 
+};
+
+
+
 
 module.exports.getUserByEmail = function (email, callback) {
   var sql = `SELECT * from user WHERE email = "${email}"`;
@@ -179,11 +211,19 @@ module.exports.comparePassword = function (candidatePassword, hash, callback) {
     callback(null, isMatch);
   });
 };
-// module.exports.updateUserStatus = function (id, status, callback) {
-//     var query = { _id: id };
-//     var update = { status: status };
-//     User.findOneAndUpdate(query, update, callback);
-// }
+module.exports.updateUserStatus = function (email, status, callback) {
+  var sql = `UPDATE user
+        SET status = ${status}
+        WHERE email = "${email}"`
+  db.connectDB(function (err, connect) {
+    if (err) callback(err, null);
+    else {
+      connect.query(sql, callback);
+      db.disconnectDB(connect);
+    }
+  });
+    
+}
 // module.exports.updateUser = function (id, update, callback) {
 //     var query = { _id: id };
 //     User.findOneAndUpdate(query, update, callback);

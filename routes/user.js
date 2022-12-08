@@ -148,33 +148,58 @@ router.post("/resetpassword", function (req, res, next) {});
 router.post("/block", function (req, res, next) {});
 router.post("/unblock", function (req, res, next) {});
 
-// router.post('/activate', function (req, res, next) {
-//     User.getUserByUsername(req.body.username, function (err, user) {
-//         if (err) {
-//             res.send(err);
-//             return;
-//         }
-//         if (!user) {
-//             res.json({ message: 'User not found' });
-//             return;
-//         }
-//         if (user.status == 'block') {
-//             res.json({ message: 'The account has been blocked' });
-//             return;
-//         }
-//         if (user.user_id == req.body.id) {
-//             User.updateUserStatus(user.user_id, 'active', function (err, user) {
-//                 if (err) {
-//                     res.send(err);
-//                     return;
-//                 }
-//                 res.json({ message: 'The account has been activated' });
-//             });
-//         } else {
-//             res.json({ message: 'The activation link is invalid' });
-//         }
-//     });
-// });
+router.post('/activate', function (req, res, next) {
+    var otp_input = req.body.otp_token;
+    User.getUserByEmailOrUsername(req.body.username, function (err, user) {
+        if (err) {
+          res.send(err);
+          return;
+        }
+        if (!user) {
+          res.json({ message: 'User not found' });
+          return;
+        }
+        if (user.status == 2) {
+          res.json({ message: 'The account has been blocked' });
+          return;
+        } else if (user.status == 1) {
+          res.json({ message: 'The account has been activated' });
+          return;
+        } else {
+          var decoded;
+          try {
+            decoded = jwt.verify(user.otp_token, "SECRET")
+          }
+          catch(err){
+            res.json({ message: decoded});
+            return;
+          }
+          User.updateUserStatus(user.email, 1, function(err, result){
+            if (err){
+              res.send(err);
+              return;
+            }
+            res.json({ message: 'Your account has been activated successfully'});
+            return;
+          })
+        }
+        // if (user.user_id == req.body.id) {
+        //     User.updateUserStatus(user.user_id, 'active', function (err, user) {
+        //         if (err) {
+        //             res.send(err);
+        //             return;
+        //         }
+        //         res.json({ message: 'The account has been activated' });
+        //     });
+        // } else {
+        //     res.json({ message: 'The activation link is invalid' });
+        // }
+
+    });
+});
+
+
+
 router.post("/login", function (req, res, next) {
   var username_email = req.body.username;
   req.checkBody("username", "Username is required").notEmpty();
@@ -190,6 +215,11 @@ router.post("/login", function (req, res, next) {
       res.json({ success: false, message: "User not found" });
     } else {
       user = user[0];
+      // if (user.status == 0){
+      //   res.json({ success: false, message: "This account is not activated" });
+      // } else if (user.status == 2){
+      //   res.json({ success: false, message: "This account is blocked" });
+      // }
       User.comparePassword(
         req.body.password,
         user.password,
@@ -226,5 +256,26 @@ router.post("/login", function (req, res, next) {
     }
   });
 });
+
+router.post("/forgetpassword",function(req, res,next){
+  var email = req.body.email;
+  User.getUserByEmailOrUsername(email, function (err, user) {
+    if (err) {
+      res.status(500).json(err);
+    } else if (user == []) {
+      res.json({ success: false, message: "User not found" });
+    } else {
+      var user = user[0];
+      User.updateToken(user.email, user.username, function(err,result){
+        if (err) {
+          res.status(500).json(err);
+        } else {
+          res.json({ success: true, message: "OTP token has been sent to your email to update your password!" });
+        }
+      })
+    }
+  })
+});
+
 
 module.exports = router;
