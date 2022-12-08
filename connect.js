@@ -1,4 +1,3 @@
-
 var mysql = require('mysql')
 
 // const HOST = process.env.HOST 
@@ -26,7 +25,6 @@ module.exports.connectDB = function (callback){
             callback(null, conn)
         }
     })
-
 }
 
 module.exports.disconnectDB = function (conn) {
