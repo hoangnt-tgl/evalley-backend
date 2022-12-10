@@ -8,11 +8,26 @@ const DIGITS = "0123456789";
 const SECRET = process.env.EVALLEY_SECRET;
 const BASE_URL = process.env.BASE_URL;
 
-const sendOTP = (email, username, OTP) => {
-  let subject = "OTP code for account verification";
+const sendOTP = (email, username, token) => {
+  let subject = "Link for account verification";
   let body = `<h1>Welcome to Shopping With Evalley</h1>
             <p>Hello: ${username}</p>
-            <p>Your account verification code is: ${OTP}</p>
+            <p>Click the link to verify your account: http://localhost:3000/user/activate/${email}/${token}</p>
+            <p>Valid for 10 minutes. DO NOT share this link with others.</p>`;
+  sendMail.sendMail(email, subject, body, (error, info) => {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log("Email sent: " + info.response);
+    }
+  });
+};
+
+const sendLinkResetPassword = (email, username, token) => {
+  let subject = "Link for account to reset password";
+  let body = `<h1>Welcome to Shopping With Evalley</h1>
+            <p>Hello: ${username}</p>
+            <p>Click the link to reset your password: http://localhost:3000/user/resetPassword/${email}/${token}</p>
             <p>Valid for 10 minutes. DO NOT share this code with others.</p>`;
   sendMail.sendMail(email, subject, body, (error, info) => {
     if (error) {
@@ -41,47 +56,20 @@ module.exports.addUser = function (username, email, password, callback) {
         }
       );
       password = hash;
-      var sql = `INSERT INTO user (email, username, password, otp_token) VALUES ("${email}", "${username}", "${password}", "${token}");`;
+      var sql = `INSERT INTO user (email, username, password) VALUES ("${email}", "${username}", "${password}");`;
       db.connectDB(function (err, connect) {
         if (err) callback(err, null);
         else {
           connect.query(sql, callback);
-          sendOTP(email, username, OTP);
+          sendOTP(email, username, token);
           db.disconnectDB(connect);
         }
       });
     });
   });
 };
-// Tạo token mới để cập nhật password
-module.exports.updateToken = function (email,username, callback) {
-  let OTP = "";
-  for (let i = 0; i < 6; i++) {
-    OTP += DIGITS[Math.floor(Math.random() * 10)];
-  }
-  var token = jwt.sign(
-    {
-      OTP: OTP,
-    },
-    "SECRET",
-    {
-      algorithm: "HS256",
-      expiresIn: 600,
-    }
-  );
-  var sql =   ` UPDATE user
-                SET otp_token = "${token}"
-                WHERE email = "${email}"
-  `;
-  db.connectDB(function (err, connect) {
-    if (err) callback(err, null);
-    else {
-      connect.query(sql, callback);
-      sendOTP(email, username, OTP);
-      db.disconnectDB(connect);
-    }
-  }); 
-};
+
+
 
 
 
@@ -145,17 +133,6 @@ module.exports.getAllUser = function (callback) {
   });
 };
 
-var checkToken = function (token) {
-  return new Promise((resolve, reject) => {
-    jwt.verify(token, SECRET, function (err, decoded) {
-      if (err) {
-        reject(err);
-      } else {
-        resolve(decoded);
-      }
-    });
-  });
-};
 
 module.exports.checkLogin = async function (req, res, next) {
   if (

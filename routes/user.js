@@ -148,16 +148,20 @@ router.post("/resetpassword", function (req, res, next) {});
 router.post("/block", function (req, res, next) {});
 router.post("/unblock", function (req, res, next) {});
 
-router.post('/activate', function (req, res, next) {
-    var otp_input = req.body.otp_token;
-    User.getUserByEmailOrUsername(req.body.username, function (err, user) {
+router.get('/activate/:email/:token', function (req, res, next) {
+    var token_input = req.params.token;
+    User.getUserByEmailOrUsername(req.params.email, function (err, users) {
+        var user
         if (err) {
           res.send(err);
           return;
         }
-        if (!user) {
+        if (!users) {
           res.json({ message: 'User not found' });
           return;
+        }
+        else {
+          user = users[0];
         }
         if (user.status == 2) {
           res.json({ message: 'The account has been blocked' });
@@ -166,12 +170,11 @@ router.post('/activate', function (req, res, next) {
           res.json({ message: 'The account has been activated' });
           return;
         } else {
-          var decoded;
-          try {
-            decoded = jwt.verify(user.otp_token, "SECRET")
+          try{
+            const decode = jwt.verify(token_input, 'SECRET');
           }
-          catch(err){
-            res.json({ message: decoded});
+          catch (err){
+            res.json({ message: 'Your link activation is expired' });
             return;
           }
           User.updateUserStatus(user.email, 1, function(err, result){
@@ -194,7 +197,6 @@ router.post('/activate', function (req, res, next) {
         // } else {
         //     res.json({ message: 'The activation link is invalid' });
         // }
-
     });
 });
 
@@ -238,7 +240,7 @@ router.post("/login", function (req, res, next) {
               }
             );
             delete user.password;
-            delete user.otp_token;
+            
             res.cookie("token", token, {
               maxAge: 604800,
               httpOnly: true,
@@ -257,25 +259,25 @@ router.post("/login", function (req, res, next) {
   });
 });
 
-router.post("/forgetpassword",function(req, res,next){
-  var email = req.body.email;
-  User.getUserByEmailOrUsername(email, function (err, user) {
-    if (err) {
-      res.status(500).json(err);
-    } else if (user == []) {
-      res.json({ success: false, message: "User not found" });
-    } else {
-      var user = user[0];
-      User.updateToken(user.email, user.username, function(err,result){
-        if (err) {
-          res.status(500).json(err);
-        } else {
-          res.json({ success: true, message: "OTP token has been sent to your email to update your password!" });
-        }
-      })
-    }
-  })
-});
+// router.post("/forgetpassword",function(req, res,next){
+//   var email = req.body.email;
+//   User.getUserByEmailOrUsername(email, function (err, user) {
+//     if (err) {
+//       res.status(500).json(err);
+//     } else if (user == []) {
+//       res.json({ success: false, message: "User not found" });
+//     } else {
+//       var user = user[0];
+//       User.updateToken(user.email, user.username, function(err,result){
+//         if (err) {
+//           res.status(500).json(err);
+//         } else {
+//           res.json({ success: true, message: "A link has been sent to your email to update your password!" });
+//         }
+//       })
+//     }
+//   })
+// });
 
 
 module.exports = router;
