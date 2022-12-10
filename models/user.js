@@ -23,11 +23,11 @@ const sendOTP = (email, username, token) => {
   });
 };
 
-const sendLinkResetPassword = (email, username, token) => {
+module.exports.sendLinkResetPassword = (email, username, token) => {
   let subject = "Link for account to reset password";
   let body = `<h1>Welcome to Shopping With Evalley</h1>
             <p>Hello: ${username}</p>
-            <p>Click the link to reset your password: http://localhost:3000/user/resetPassword/${email}/${token}</p>
+            <p>Click the link to reset your password: http://localhost:3000/user/verifytoresetpassword/${email}/${token}</p>
             <p>Valid for 10 minutes. DO NOT share this code with others.</p>`;
   sendMail.sendMail(email, subject, body, (error, info) => {
     if (error) {

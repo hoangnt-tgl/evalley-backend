@@ -136,11 +136,9 @@ router.post("/update", function (req, res, next) {
   return;
 });
 
-router.post("/changepassword", function (req, res, next) {});
 
-router.post("/forgotpassword", function (req, res, next) {});
 
-router.post("/resetpassword", function (req, res, next) {});
+
 router.post("/block", function (req, res, next) {});
 router.post("/unblock", function (req, res, next) {});
 
@@ -255,25 +253,39 @@ router.post("/login", function (req, res, next) {
   });
 });
 
-// router.post("/forgetpassword",function(req, res,next){
-//   var email = req.body.email;
-//   User.getUserByEmailOrUsername(email, function (err, user) {
-//     if (err) {
-//       res.status(500).json(err);
-//     } else if (user == []) {
-//       res.json({ success: false, message: "User not found" });
-//     } else {
-//       var user = user[0];
-//       User.updateToken(user.email, user.username, function(err,result){
-//         if (err) {
-//           res.status(500).json(err);
-//         } else {
-//           res.json({ success: true, message: "A link has been sent to your email to update your password!" });
-//         }
-//       })
-//     }
-//   })
-// });
+router.post("/forgetpassword",function(req, res,next){
+  var email = req.body.email;
+  User.getUserByEmailOrUsername(email, function (err, user) {
+    if (err) {
+      res.status(500).json(err);
+    } else if (user == []) {
+      res.json({ success: false, message: "User not found" });
+    } else {
+      var user = user[0];
+      let OTP = "";
+      for (let i = 0; i < 6; i++) {
+        OTP += DIGITS[Math.floor(Math.random() * 10)];
+      }
+      var token = jwt.sign(
+        {
+          OTP: OTP,
+        },
+        "SECRET",
+        {
+          algorithm: "HS256",
+          expiresIn: 600,
+        }
+      );
+      User.sendLinkResetPassword(user.email, user.username, token, function(err, result){
+        if (err) {
+          res.status(500).json(err);
+        } else if (user == []) {
+          res.json({ success: false, message: "A link has been sent to email to reset password" });
+        }
+      })
+    }
+  })
+});
 router.post("/resetpassword",function(req, res,next){
   req.checkBody("password", "Password is required").notEmpty();
   req.checkBody("password", "Password must be at least 6 characters long").isLength({ min: 6 });
@@ -282,5 +294,29 @@ router.post("/resetpassword",function(req, res,next){
     res.status(200).json({ success: true, msg: "Successful update password" });
   })
 })
-
+router.get("/verifytoresetpassword/:email/:token", function(req,res,next){
+    var token_input = req.params.token;
+    User.getUserByEmailOrUsername(req.params.email, function (err, users) {
+        var user
+        if (err) {
+          res.send(err);
+          return;
+        }
+        if (!users) {
+          res.json({ message: 'User not found' });
+          return;
+        }
+        else {
+          user = users[0];
+        }
+        try{
+          const decode = jwt.verify(token_input, 'SECRET');
+        }
+        catch (err){
+          res.json({ message: 'Your link activation is expired' });
+          return;
+        }
+        // Dieu huong den trang cap nhat password
+      })
+})
 module.exports = router;
