@@ -68,7 +68,22 @@ module.exports.addUser = function (username, email, password, callback) {
     });
   });
 };
-
+module.exports.updatePassword = function (username, password, callback) {
+  bcrypt.genSalt(10, function (err, salt) {
+    bcrypt.hash(password, salt, function (err, hash) {
+      password = hash;
+      // var sql = `INSERT INTO user (email, username, password) VALUES ("${email}", "${username}", "${password}");`;
+      var sql = `UPDATE user SET password = ${password} WHERE username = ${username}`
+      db.connectDB(function (err, connect) {
+        if (err) callback(err, null);
+        else {
+          connect.query(sql, callback);
+          db.disconnectDB(connect);
+        }
+      });
+    });
+  });
+};
 
 
 

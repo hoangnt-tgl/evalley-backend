@@ -13,15 +13,11 @@ router.post("/register", function (req, res, next) {
   //     password: req.body.password,
   // });
   req.checkBody("username", "Username is required").notEmpty();
-  req
-    .checkBody("username", "Username must be at least 6 characters long")
-    .isLength({ min: 6 });
+  req.checkBody("username", "Username must be at least 6 characters long").isLength({ min: 6 });
   req.checkBody("email", "Email is required").notEmpty();
   req.checkBody("email", "Email is not valid").isEmail();
   req.checkBody("password", "Password is required").notEmpty();
-  req
-    .checkBody("password", "Password must be at least 6 characters long")
-    .isLength({ min: 6 });
+  req.checkBody("password", "Password must be at least 6 characters long").isLength({ min: 6 });
   var errors = req.validationErrors();
   if (errors) {
     res.json({ status: false, msg: errors[0].msg });
@@ -278,6 +274,13 @@ router.post("/login", function (req, res, next) {
 //     }
 //   })
 // });
-
+router.post("/resetpassword",function(req, res,next){
+  req.checkBody("password", "Password is required").notEmpty();
+  req.checkBody("password", "Password must be at least 6 characters long").isLength({ min: 6 });
+  User.updatePassword(req.body.password,function(err,result){
+    if (err) console.log(err);
+    res.status(200).json({ success: true, msg: "Successful update password" });
+  })
+})
 
 module.exports = router;
