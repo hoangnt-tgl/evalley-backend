@@ -38,13 +38,14 @@ var brand = require('./routes/brand');
 var category = require('./routes/category');
 var review = require('./routes/review');
 var ghn = require('./routes/ghn');
-// var countrycode = require('./routes/countrycode');
+var auth = require('./routes/auth');
 
 app.use('/user', user);
 app.use('/voucher', voucher);
 app.use('/product', product);
 app.use('/brand', brand);
 app.use('/ghn', ghn);
+app.use('/auth',auth);
 // headers: {'Authorization': `Basic ${localStorage.getItem('token')}` }
 
 

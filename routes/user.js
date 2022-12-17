@@ -3,8 +3,9 @@ var bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
 var router = express.Router();
 var User = require("../models/user");
-require("dotenv").config();
 const SECRET = process.env.EVALLEY_SECRET;
+require("dotenv").config();
+
 
 router.post("/register", function (req, res, next) {
   // var newUser = new User({
@@ -165,7 +166,7 @@ router.get('/activate/:email/:token', function (req, res, next) {
           return;
         } else {
           try{
-            const decode = jwt.verify(token_input, 'SECRET');
+            const decode = jwt.verify(token_input, SECRET);
           }
           catch (err){
             res.json({ message: 'Your link activation is expired' });
@@ -270,7 +271,7 @@ router.post("/forgetpassword",function(req, res,next){
         {
           OTP: OTP,
         },
-        "SECRET",
+        SECRET,
         {
           algorithm: "HS256",
           expiresIn: 600,
@@ -279,8 +280,8 @@ router.post("/forgetpassword",function(req, res,next){
       User.sendLinkResetPassword(user.email, user.username, token, function(err, result){
         if (err) {
           res.status(500).json(err);
-        } else if (user == []) {
-          res.json({ success: false, message: "A link has been sent to email to reset password" });
+        } else  {
+          res.json({ success: true, message: "A link has been sent to email to reset password" });
         }
       })
     }
@@ -310,7 +311,7 @@ router.get("/verifytoresetpassword/:email/:token", function(req,res,next){
           user = users[0];
         }
         try{
-          const decode = jwt.verify(token_input, 'SECRET');
+          const decode = jwt.verify(token_input, SECRET);
         }
         catch (err){
           res.json({ message: 'Your link activation is expired' });
@@ -319,4 +320,9 @@ router.get("/verifytoresetpassword/:email/:token", function(req,res,next){
         // Dieu huong den trang cap nhat password
       })
 })
+
+
+
+
+
 module.exports = router;
