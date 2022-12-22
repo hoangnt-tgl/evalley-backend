@@ -19,7 +19,7 @@ module.exports.checkLogin = function (req, res, next) {
                         return;
                     }
                     req.user = user;
-                    next();
+                   next();
                 });
             }
         });

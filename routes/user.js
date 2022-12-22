@@ -4,9 +4,7 @@ var jwt = require("jsonwebtoken");
 var router = express.Router();
 var User = require("../models/user");
 const SECRET = process.env.EVALLEY_SECRET;
-require("dotenv").config();
-
-
+const { loginByGoogle } = require("../controllers/user");
 router.post("/register", function (req, res, next) {
   // var newUser = new User({
   //     username: req.body.username,
@@ -52,6 +50,7 @@ router.post("/register", function (req, res, next) {
   }
 });
 
+router.post("/login-by-google", loginByGoogle);
 // router.post('/login', function (req, res, next) {
 //     User.getUserByUsername(req.body.username, function (err, user) {
 //         if (err) {
