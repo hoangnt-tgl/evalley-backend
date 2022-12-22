@@ -2,7 +2,6 @@ var db = require("../connect");
 var sendMail = require("./send-mail");
 var bcrypt = require("bcryptjs");
 var jwt = require("jsonwebtoken");
-require("dotenv").config();
 const DIGITS = "0123456789";
 
 const SECRET = process.env.EVALLEY_SECRET;
@@ -36,6 +35,30 @@ module.exports.sendLinkResetPassword = (email, username, token) => {
 			console.log("Email sent: " + info.response);
 		}
 	});
+};
+
+module.exports.createUser = async newUser => {
+	try {
+		let salt = bcrypt.genSaltSync(10);
+		newUser.password = bcrypt.hashSync(newUser.password, salt);
+		let sql = "INSERT INTO user SET ?";
+		console.log(newUser);
+		return await new Promise((resolve, reject) => {
+			db.connectDB((err, connect) => {
+				if (err) reject(err);
+				else {
+					connect.query(sql, newUser, (err, result) => {
+						if (err) reject(err);
+						else resolve(result);
+						console.log(result);
+						db.disconnectDB(connect);
+					});
+				}
+			});
+		});
+	} catch (error) {
+		console.log(error);
+	}
 };
 
 module.exports.generateToken = user => {
@@ -98,14 +121,23 @@ module.exports.updatePassword = function (username, password, callback) {
 	});
 };
 
-module.exports.getUserByEmail = (email, callback) => {
-	const sql = `SELECT * from user WHERE email = "${email}"`;
-	db.connectDB((err, connect) => {
-		if (err) throw err;
-		connect.query(sql, callback);
-		db.disconnectDB(connect);
+module.exports.getUserByEmail = async email => {
+	let sql = `SELECT * FROM user WHERE email = ?`;
+	return await new Promise((resolve, reject) => {
+		db.connectDB(function (err, connect) {
+			if (err) reject(err);
+			else {
+				connect.query(sql, [email], (err, result) => {
+					if (err) reject(err);
+					else if (result.length === 0) resolve(null);
+					else resolve(result[0]);
+				});
+				db.disconnectDB(connect);
+			}
+		});
 	});
 };
+
 module.exports.getUserByEmailOrUsername = function (username, callback) {
 	var sql = "";
 	if (username.includes("@")) {
@@ -133,14 +165,20 @@ module.exports.getUserById = function (id, callback) {
 	});
 };
 
-module.exports.getUserByUsername = function (username, callback) {
-	var sql = `SELECT * from user WHERE username = "${username}"`;
-	db.connectDB(function (err, connect) {
-		if (err) callback(err, null);
-		else {
-			connect.query(sql, callback);
-			db.disconnectDB(connect);
-		}
+module.exports.getUserByUsername = async (username) => {
+	let sql = `SELECT * FROM user WHERE username = ?`;
+	return await new Promise((resolve, reject) => {
+		db.connectDB(function (err, connect) {
+			if (err) reject(err);
+			else {
+				connect.query(sql, [username], (err, result) => {
+					if (err) reject(err);
+					else if (result.length === 0) resolve(null);
+					else resolve(result[0]);
+				});
+				db.disconnectDB(connect);
+			}
+		});
 	});
 };
 
@@ -155,49 +193,8 @@ module.exports.getAllUser = function (callback) {
 	});
 };
 
-module.exports.checkLogin = async function (req, res, next) {
-	if (!req.headers.authorization || !(req.headers.authorization.split(" ")[0] === "Basic")) {
-		res.status(401).json({
-			auth: false,
-			message: "No token found.",
-		});
-	} else {
-		try {
-			let decode = await checkToken(req.headers.authorization.split(" ")[1]);
-			req.user = decode.id;
-			next();
-		} catch (err) {
-			res.status(401).json({ auth: false, message: "Failed to authenticate token." });
-		}
-	}
-};
-
-module.exports.checkAdmin = async function (req, res, next) {
-	if (!req.headers.authorization || !(req.headers.authorization.split(" ")[0] === "Basic")) {
-		res.status(401).json({
-			auth: false,
-			message: "No token found.",
-		});
-	} else {
-		try {
-			let decode = await checkToken(req.headers.authorization.split(" ")[1]);
-			if (decode.type == 1) {
-				req.user = decode.id;
-				next();
-			} else {
-				res.status(401).json({ auth: false, message: "You are not admin" });
-			}
-		} catch (err) {
-			res.status(401).json({ auth: false, message: "Failed to authenticate token." });
-		}
-	}
-};
-
-module.exports.comparePassword = function (candidatePassword, hash, callback) {
-	bcrypt.compare(candidatePassword, hash, function (err, isMatch) {
-		if (err) throw err;
-		callback(null, isMatch);
-	});
+module.exports.comparePassword = async (candidatePassword, hash) => {
+	return await bcrypt.compare(candidatePassword, hash);
 };
 module.exports.updateUserStatus = function (email, status, callback) {
 	var sql = `UPDATE user

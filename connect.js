@@ -5,18 +5,20 @@ var mysql = require("mysql");
 // const PASS = process.env.PASS
 // const DATABASE = process.env.DATABASE
 
-const HOST = "database-1.cwlufpqi7u2x.ap-northeast-1.rds.amazonaws.com";
-const USER = "admin";
-const PASS = "tronghoang";
-const DATABASE = "online_shopping";
+const HOST = "us-cdbr-east-06.cleardb.net";
+const USER = "b065780d61e2ce";
+const PASS = "708ae885";
+const DATABASE = "heroku_992add2aeba263d";
+
+const config = {
+	host: HOST,
+	user: USER,
+	password: PASS,
+	database: DATABASE,
+};
 
 module.exports.connectDB = function (callback) {
-	const conn = mysql.createConnection({
-		host: HOST,
-		user: USER,
-		password: PASS,
-		database: DATABASE,
-	});
+	const conn = mysql.createConnection(config);
 	conn.connect(function (err) {
 		if (err) {
 			callback(err, null);
@@ -25,6 +27,7 @@ module.exports.connectDB = function (callback) {
 		}
 	});
 };
+
 
 module.exports.disconnectDB = function (conn) {
 	conn.end();
