@@ -42,7 +42,6 @@ module.exports.createUser = async newUser => {
 		let salt = bcrypt.genSaltSync(10);
 		newUser.password = bcrypt.hashSync(newUser.password, salt);
 		let sql = "INSERT INTO user SET ?";
-		console.log(newUser);
 		return await new Promise((resolve, reject) => {
 			db.connectDB((err, connect) => {
 				if (err) reject(err);
@@ -155,16 +154,22 @@ module.exports.getUserByEmailOrUsername = function (username, callback) {
 };
 
 module.exports.getUserById = function (id, callback) {
-	var sql = `SELECT * from user WHERE user_id = ${id}`;
-	db.connectDB(function (err, connect) {
-		if (err) callback(err, null);
-		else {
-			connect.query(sql, callback);
-			db.disconnectDB(connect);
-		}
+	let sql = `SELECT * FROM user WHERE user_id = ?`;
+	return new Promise((resolve, reject) => {
+		db.connectDB(function (err, connect) {
+			if (err) reject(err);
+			else {
+				connect.query(sql, [id], (err, result) => {
+					if (err) reject(err);
+					else if (result.length === 0) resolve(null);
+					else resolve(result[0]);
+				});
+				db.disconnectDB(connect);
+			}
+		});
 	});
 };
-
+	
 module.exports.getUserByUsername = async (username) => {
 	let sql = `SELECT * FROM user WHERE username = ?`;
 	return await new Promise((resolve, reject) => {

@@ -32,14 +32,15 @@ module.exports.loginByGoogle = async (req, res) => {
 
 module.exports.loginByFacebook = async (req, res) => {
 	try {
-		const { token, username, name, password } = req.body;
+		const { token, username, name, email, image } = req.body;
+		console.log(token);
 		let user = await User.getUserByUsername(username);
 		if (!user) {
 			const decode = await axios.get(`https://graph.facebook.com/me?access_token=${token}`).then(res => res.data);
 			let newUser = {
 				username: username,
-				password: password,
-				avatar: `https://graph.facebook.com/${id}/picture?type=large`,
+				password: decode.id,
+				avatar: image,
 				name: name,
 				email: email
 			};
@@ -92,7 +93,7 @@ module.exports.register = async (req, res) => {
 module.exports.getUserInfo = async (req, res) => {
 	try {
 		if (!req.user) return res.status(400).json({ message: "Unauthorized" });
-		const user = await User.getUserByEmail(req.user.email);
+		const user = await User.getUserById(req.user.id);
 		res.status(200).json(user);
 	} catch (error) {
 		console.log(error);
