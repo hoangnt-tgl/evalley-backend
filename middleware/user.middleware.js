@@ -1,3 +1,6 @@
+const jwt = require("jsonwebtoken");
+const SECRET = process.env.EVALLEY_SECRET;
+
 module.exports.checkInputRegister = async (req, res, next) => {
 	req.checkBody("username", "Username is required").notEmpty();
 	req.checkBody("email", "Email is required").notEmpty();
@@ -50,4 +53,19 @@ module.exports.checkInputResetPassword = async (req, res, next) => {
 		return res.status(400).json({ message: errors[0].msg });
 	}
 	next();
+};
+
+module.exports.checkLogin = async (req, res, next) => {
+	if (req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
+		var token = req.headers.authorization.split(" ")[1];
+		jwt.verify(token, SECRET, function (err, decoded) {
+			if (err) {
+				return res.status(401).json({ message: "Unauthorized" });
+			}
+			req.user = decoded;
+			next();
+		});
+	} else {
+		return res.status(401).json({ message: "Unauthorized" });
+	}
 };

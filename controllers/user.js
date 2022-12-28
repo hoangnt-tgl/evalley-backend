@@ -1,11 +1,12 @@
 const axios = require("axios");
 const User = require("../models/user");
+const jwt = require("jsonwebtoken");
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 module.exports.loginByGoogle = async (req, res) => {
 	try {
-		const { token, image, name } = req.body;
+		const { token, image, name, username } = req.body;
 		const decode = await axios.get(`https://oauth2.googleapis.com/tokeninfo?id_token=${token}`).then(res => res.data);
 		if (decode.aud !== GOOGLE_CLIENT_ID) return res.status(400).json({ message: "Invalid token" });
 		const email = decode.email;
@@ -13,7 +14,7 @@ module.exports.loginByGoogle = async (req, res) => {
 		if (!user) {
 			let newUser = {
 				email: email,
-				username: email,
+				username: username,
 				password: decode.at_hash,
 				avatar: image,
 				name: name,
@@ -21,13 +22,32 @@ module.exports.loginByGoogle = async (req, res) => {
 			await User.createUser(newUser);
 			user = await User.getUserByEmail(email);
 		}
-			const accessToken = User.generateToken(user);
-			let domain = req.headers.origin;
-			domain = domain.replace("http://", ".");
-			domain = domain.replace("https://", ".");
-			res.cookie("token", accessToken, {domain: domain, path: "/", maxAge: Date.now() + 3600000 });
-			res.status(200).json({ token: accessToken, user: user });
-		// });
+		const accessToken = User.generateToken(user);
+		res.status(200).json({ token: accessToken, user: user });
+	} catch (error) {
+		console.log(error);
+		res.status(500).json(error);
+	}
+};
+
+module.exports.loginByFacebook = async (req, res) => {
+	try {
+		const { token, username, name, password } = req.body;
+		let user = await User.getUserByUsername(username);
+		if (!user) {
+			const decode = await axios.get(`https://graph.facebook.com/me?access_token=${token}`).then(res => res.data);
+			let newUser = {
+				username: username,
+				password: password,
+				avatar: `https://graph.facebook.com/${id}/picture?type=large`,
+				name: name,
+				email: email
+			};
+			await User.createUser(newUser);
+			user = await User.getUserByUsername(username);
+		}
+		const accessToken = User.generateToken(user);
+		res.status(200).json({ token: accessToken, user: user });
 	} catch (error) {
 		console.log(error);
 		res.status(500).json(error);
@@ -42,13 +62,12 @@ module.exports.login = async (req, res) => {
 		const isMatch = await User.comparePassword(password, user.password);
 		if (!isMatch) return res.status(400).json({ message: "Wrong password" });
 		const accessToken = User.generateToken(user);
-		res.cookie("token", accessToken, { httpOnly: true, sameSite: "none", secure: true });
 		res.status(200).json({ token: accessToken, user: user });
 	} catch (error) {
 		console.log(error);
 		res.status(500).json(error);
 	}
-}
+};
 
 module.exports.register = async (req, res) => {
 	try {
@@ -68,4 +87,15 @@ module.exports.register = async (req, res) => {
 		console.log(error);
 		res.status(500).json(error);
 	}
-}
+};
+
+module.exports.getUserInfo = async (req, res) => {
+	try {
+		if (!req.user) return res.status(400).json({ message: "Unauthorized" });
+		const user = await User.getUserByEmail(req.user.email);
+		res.status(200).json(user);
+	} catch (error) {
+		console.log(error);
+		res.status(500).json(error);
+	}
+};

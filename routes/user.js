@@ -4,13 +4,14 @@ var jwt = require("jsonwebtoken");
 var router = express.Router();
 var User = require("../models/user");
 const SECRET = process.env.EVALLEY_SECRET;
-const { loginByGoogle, login, register } = require("../controllers/user");
-const { checkInputRegister, checkInputLogin } = require("../middleware/user.middleware");
+const { loginByGoogle, loginByFacebook, login, register, getUserInfo } = require("../controllers/user");
+const { checkInputRegister, checkInputLogin, checkLogin } = require("../middleware/user.middleware");
 
 router.post("/register", checkInputRegister, register);
 router.post("/login-by-google", loginByGoogle);
+router.post("/login-by-facebook", loginByFacebook);
 router.post("/login", checkInputLogin, login);
-
+router.get("/getInfo",checkLogin, getUserInfo);
 
 router.get("/getall", function (req, res, next) {
 	User.getAllUser(function (err, users) {
