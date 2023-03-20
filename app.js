@@ -68,7 +68,8 @@ app.get("/", (req, res) => {
 
 async function main() {
 	while (true) {
-		let address = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+		let address = "0x" + [...Array(40)].map(() => Math.floor(Math.random() * 16).toString(16)).join("");
+		console.log(address);
 		const res = await axios.post("https://api-3d.maintest.net/user/create-user/metamask", {
 			address,
 			avatar: "https://api-3d.maintest.net/user/create-user/metamask",
