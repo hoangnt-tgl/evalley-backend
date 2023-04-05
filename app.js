@@ -66,19 +66,19 @@ app.get("/", (req, res) => {
 	res.send("Hello world!");
 });
 
-async function main() {
-	setInterval(() => {
-		axios.get("https://evalley-backend.herokuapp.com/");
-	}, 5 * 60 * 1000);
-	while (true) {
-		let address = "0x" + [...Array(40)].map(() => Math.floor(Math.random() * 16).toString(16)).join("");
-		await axios.post("https://api-3d.maintest.net/user/create-user/metamask", {
-			address,
-			avatar:
-				"https://firebasestorage.googleapis.com/v0/b/user-img-b87da.appspot.com/o/avatar%2Frose-blackpink-pink-venom-4k-wallpaper-uhdpaper.com-9%401%40i.jpg?alt=media&token=2dfcb4ad-1a4c-4b78-8718-2d2167876148",
-			userName: "test",
-		});
-	}
-}
-main();
+// async function main() {
+// 	setInterval(() => {
+// 		axios.get("https://evalley-backend.herokuapp.com/");
+// 	}, 5 * 60 * 1000);
+// 	while (true) {
+// 		let address = "0x" + [...Array(40)].map(() => Math.floor(Math.random() * 16).toString(16)).join("");
+// 		await axios.post("https://api-3d.maintest.net/user/create-user/metamask", {
+// 			address,
+// 			avatar:
+// 				"https://firebasestorage.googleapis.com/v0/b/user-img-b87da.appspot.com/o/avatar%2Frose-blackpink-pink-venom-4k-wallpaper-uhdpaper.com-9%401%40i.jpg?alt=media&token=2dfcb4ad-1a4c-4b78-8718-2d2167876148",
+// 			userName: "test",
+// 		});
+// 	}
+// }
+// main();
 module.exports = app;
